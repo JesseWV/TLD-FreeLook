@@ -19,17 +19,18 @@ Configurable in-game under **Mod Settings → Free Look**:
 | Setting | Default | What it does |
 |---|---|---|
 | Enable free look | On | Turn the whole feature off and restore stock camera behaviour. |
-| Free look key | Left Alt | The key held to look around. |
+| Free look key | Left Alt | The key held to look around. A mouse button works too. |
 | Toggle instead of hold | Off | Tap to enter free look and tap again to leave, rather than holding. |
-| Look range | 110° | How far the view may swing from your direction of travel, to each side. The default is about as far as an average person can look without moving their shoulders — roughly 80° of neck rotation plus 30° of eye movement. |
+| Double tap to latch | Off | Holding still works, but a quick double tap latches free look on until you press again. |
+| Look range | 155° | How far the view may swing from your direction of travel, to each side. The default is about as far as you can look while still walking forwards — neck, eyes and a twist from the hips. |
 | Return time | 150 ms | How long the view takes to swing back once released. Zero snaps instantly. |
-| Return vertical too | On | Bring your view back to the height it was at when you started looking, not just the direction. |
+| Turn to face your aim | On | Raising a weapon while looking around turns you to face where you were looking, rather than swinging your view back. |
 | Disable while aiming | On | Suppress free look while a weapon is raised, so your aim is never pointed somewhere you are not looking. |
 | Show held item while looking | Off | Keep whatever is in your hands on screen while looking around. Expect visible cut-off edges — see below. |
-| Hide beyond | 55° | Used only when the held item is shown: how far you may look, either way, before it is hidden. |
+| Hide beyond | 180° | Used only when the held item is shown: how far you may look before it is hidden after all. At 180 it is never hidden. |
 | No free look with an item equipped | Off | Stand down entirely whenever something is in your hands. |
 | No free look while crouched | Off | Stand down while crouched. |
-| Hide beyond | 55° | Used only when the held item is shown: how far you may look, either way, before it is hidden. |
+| Hide beyond | 180° | Used only when the held item is shown: how far you may look before it is hidden after all. At 180 it is never hidden. |
 | No free look with an item equipped | Off | Stand down entirely whenever something is in your hands. |
 | No free look while crouched | Off | Stand down while crouched. |
 
@@ -41,7 +42,7 @@ So by default they are simply hidden while you are looking around, and restored 
 
 If you would rather keep your tool or weapon on screen, turn on **Show held item while looking** — but know what you are choosing. These models were only ever built for a view pointing straight ahead, so once you turn far enough you start seeing where they were cut off: hollow edges, geometry that stops in mid-air, and surfaces you can see straight through because their backs were never modelled. Look far enough down or to the side and the camera passes inside the mesh entirely.
 
-**Hide beyond** decides how far you may look before it is hidden anyway. Set it by eye to taste — where each mesh was cut is the artist's decision, so there is no value that is right for every item.
+**Hide beyond** then decides whether it is taken away again once you look far enough round. It defaults to 180°, which never hides — having chosen to see your item, you get to see it. Lower it if you would rather the cutoff were hidden past some angle; where each mesh was cut is the artist's decision, so set it by eye to taste.
 
 Your bare arms always hide immediately regardless, since there is no angle at which a bare arm and torso stub looks right.
 

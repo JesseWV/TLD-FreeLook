@@ -33,20 +33,24 @@ internal sealed class Settings : JsonModSettings
     [Description("Tap the key to enter free look and tap again to leave, rather than holding it down. Handy for long walks, but it is easy to forget you left it on.")]
     public bool ToggleMode = false;
 
+    [Name("Double tap to latch")]
+    [Description("Holding still works as normal, but a quick double tap of the key latches free look on until you press it again. Useful on a long walk, where holding the key gets tiring.")]
+    public bool DoubleTapLatch = false;
+
     [Section("Feel")]
     [Name("Look range")]
-    [Description("How far the view may swing from the direction you are walking, to each side. The default of 110 degrees is about as far as an average person can look without moving their shoulders - roughly 80 degrees of neck rotation plus 30 of eye movement.")]
+    [Description("How far the view may swing from the direction you are walking, to each side. The default of 155 degrees is about as far as you can look while still walking forwards - neck, eyes and a twist from the hips.")]
     [Slider(15f, 180f, 166, NumberFormat = "{0:0}°")]
-    public float YawLimit = 110f;
+    public float YawLimit = 155f;
 
     [Name("Return time")]
     [Description("How long the view takes to swing back to the direction of travel after you release the key. Zero snaps back instantly.")]
     [Slider(0f, 300f, 7, NumberFormat = "{0:0} ms")]
     public float ReturnMilliseconds = 150f;
 
-    [Name("Return vertical too")]
-    [Description("Bring your view back to the height it was at when you started looking around, not just the direction. Off leaves the vertical wherever you left it.")]
-    public bool ReturnVertical = true;
+    [Name("Turn to face your aim")]
+    [Description("Raising a weapon while looking around turns you to face where you were looking, instead of swinging your view back to where you were walking. Off means the view snaps back and you aim where your body was pointing.")]
+    public bool TurnToAim = true;
 
     [Name("Disable while aiming")]
     [Description("Suppress free look while a weapon is raised, so your aim is never pointed somewhere you are not looking. Recommended.")]
@@ -58,9 +62,9 @@ internal sealed class Settings : JsonModSettings
     public bool ShowHeldItem = false;
 
     [Name("Hide beyond")]
-    [Description("How far you may look, either way, before the held item is hidden anyway.")]
+    [Description("How far you may look, either way, before the held item is hidden after all. At 180 it is never hidden. Lower it if you would rather the incomplete meshes were taken away once you look far enough round.")]
     [Slider(0f, 180f, 181, NumberFormat = "{0:0}°")]
-    public float HideBeyond = 55f;
+    public float HideBeyond = 180f;
 
     [Section("Locks")]
     [Name("No free look with an item equipped")]
@@ -85,10 +89,11 @@ internal sealed class Settings : JsonModSettings
         Config.EnableMod = EnableMod;
         Config.ModifierKey = ModifierKey;
         Config.ToggleMode = ToggleMode;
+        Config.DoubleTapLatch = DoubleTapLatch;
         Config.YawLimit = Mathf.Round(YawLimit);
         Config.ReturnSeconds = Mathf.Round(ReturnMilliseconds) / 1000f;
-        Config.ReturnVertical = ReturnVertical;
         Config.DisableWhileAiming = DisableWhileAiming;
+        Config.TurnToAim = TurnToAim;
         Config.ShowHeldItem = ShowHeldItem;
         Config.HideBeyond = Mathf.Round(HideBeyond);
         Config.DisableWhenEquipped = DisableWhenEquipped;
@@ -102,6 +107,10 @@ internal sealed class Settings : JsonModSettings
         SetFieldVisible(nameof(Verbose), ShowDiagnostics);
 
         SetFieldVisible(nameof(HideBeyond), ShowHeldItem);
+
+        SetFieldVisible(nameof(DoubleTapLatch), !ToggleMode);
+
+        SetFieldVisible(nameof(TurnToAim), DisableWhileAiming);
         RefreshGUI();
     }
 
@@ -111,7 +120,7 @@ internal sealed class Settings : JsonModSettings
         Push();
 
         if (field.Name == nameof(ModifierKey) || field.Name == nameof(ToggleMode)
-            || field.Name == nameof(EnableMod))
+            || field.Name == nameof(DoubleTapLatch) || field.Name == nameof(EnableMod))
             FreeLookController.Reset();
     }
 

@@ -11,6 +11,10 @@ internal static class FreeLookController
 
     private static bool _latched;
 
+    private const float DoubleTapWindow = 0.3f;
+
+    private static float _lastTapTime = -1f;
+
     private static float _yawOffset;
 
     private static float _returnVelocity;
@@ -31,6 +35,8 @@ internal static class FreeLookController
         _weaponCam = null;
         _requested = false;
         _latched = false;
+        _revealHoldUntil = 0f;
+        _lastTapTime = -1f;
         _yawOffset = 0f;
         _returnVelocity = 0f;
         _wasEngaged = false;
@@ -52,10 +58,39 @@ internal static class FreeLookController
             return;
         }
 
+        if (_latched && Il2Cpp.GameManager.ControlsLocked())
+        {
+            _latched = false;
+            _lastTapTime = -1f;
+        }
+
         if (Config.ToggleMode)
         {
             if (Input.GetKeyDown(Config.ModifierKey)) _latched = !_latched;
             _requested = _latched;
+        }
+        else if (Config.DoubleTapLatch)
+        {
+            if (Input.GetKeyDown(Config.ModifierKey))
+            {
+                if (_latched)
+                {
+
+                    _latched = false;
+                    _lastTapTime = -1f;
+                }
+                else if (Time.unscaledTime - _lastTapTime <= DoubleTapWindow)
+                {
+                    _latched = true;
+                    _lastTapTime = -1f;
+                }
+                else
+                {
+                    _lastTapTime = Time.unscaledTime;
+                }
+            }
+
+            _requested = _latched || Input.GetKey(Config.ModifierKey);
         }
         else
         {
@@ -94,6 +129,8 @@ internal static class FreeLookController
         if (camera == null) return;
 
         bool engaged = ShouldEngage(camera);
+
+        TurnBodyToAim(camera, engaged);
 
         if (engaged)
         {
@@ -160,7 +197,7 @@ internal static class FreeLookController
             return;
         }
 
-        if (_wasEngaged && Config.ReturnVertical) _pitchReturning = true;
+        if (_wasEngaged) _pitchReturning = true;
 
         if (!_pitchReturning) return;
 
@@ -190,9 +227,47 @@ internal static class FreeLookController
         camera.m_TargetPitch = pitch;
     }
 
-    private static bool WantHidden(vp_FPSCamera camera, bool active)
+    private const float RevealAngle = 8f;
+
+    private static void TurnBodyToAim(vp_FPSCamera camera, bool engaged)
     {
+        if (engaged || !_wasEngaged || _yawOffset == 0f) return;
+        if (!Config.TurnToAim || !Config.DisableWhileAiming) return;
+        if (!_requested || !camera.IsZoomed) return;
+
+        float committed = _yawOffset;
+
+        camera.m_Yaw += committed;
+        camera.m_TargetYaw += committed;
+        camera.m_CurrentYaw += committed;
+
+        _yawOffset = 0f;
+        _returnVelocity = 0f;
+        _entryPitch = camera.m_Pitch;
+
+        Transform t = camera.transform;
+        if (t != null) t.rotation = Quaternion.AngleAxis(committed, Vector3.up) * t.rotation;
+
+        camera.SnapSprings();
+
+        _revealHoldUntil = Time.unscaledTime + AimRevealHoldSeconds;
+        if (Config.Verbose) Core.Log.Msg($"raised a weapon mid-look; turned the body {committed:0.0} deg to face it");
+    }
+
+    private const float AimRevealHoldSeconds = 0.035f;
+
+    private static float _revealHoldUntil;
+
+    private static bool WantHidden(vp_FPSCamera camera, bool engaged, bool active)
+    {
+
+        if (Time.unscaledTime < _revealHoldUntil) return true;
+
         if (!active) return false;
+
+        if (camera.IsZoomed) return false;
+
+        if (!engaged && Mathf.Abs(_yawOffset) <= RevealAngle) return false;
 
         if (NothingEquipped()) return true;
 
@@ -209,7 +284,7 @@ internal static class FreeLookController
     {
 
         bool active = engaged || _yawOffset != 0f;
-        bool wantHidden = WantHidden(camera, active);
+        bool wantHidden = WantHidden(camera, engaged, active);
 
         if (wantHidden == _maskCleared) return;
 
