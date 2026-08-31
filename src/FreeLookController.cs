@@ -107,6 +107,7 @@ internal static class FreeLookController
         if (Config.ModifierKey != KeyCode.None && Input.GetKey(Config.ModifierKey)) return true;
 
         if (!Config.ToggleMode && !Config.DoubleTapLatch) return false;
+        if (!Il2Cpp.InputManager.CheckForActiveController()) return false;
 
         if (_pollContext == null) _pollContext = UnityEngine.Object.FindObjectOfType<vp_FPSCamera>();
         return _pollContext != null && Il2Cpp.InputManager.GetAutoWalkDown(_pollContext);

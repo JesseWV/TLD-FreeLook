@@ -34,7 +34,7 @@ internal sealed class Settings : JsonModSettings
     public bool ToggleMode = false;
 
     [Name("Double tap to latch")]
-    [Description("Holding still works as normal, but a quick double tap latches free look on, and another releases it. Useful on a long walk, and the only way to use free look on a controller: in this mode the game's auto-walk button triggers it too, which on a pad is the left stick click. Auto-walk is a toggle, so the two presses leave it exactly as they were.")]
+    [Description("Holding still works as normal, but a quick double tap latches free look on, and another releases it. Useful on a long walk, and the only way to use free look on a controller: while a controller is in use, this mode lets the game's auto-walk button trigger free look too, which on a pad is the left stick click. Auto-walk is a toggle, so the two presses leave it exactly as they were.")]
     public bool DoubleTapLatch = false;
 
     [Section("Feel")]
