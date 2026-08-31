@@ -111,6 +111,8 @@ internal static class FreeLookController
 
         if (Config.DisableWhileCrouched && IsCrouching()) return false;
 
+        if (CameraDetachedFromBody(camera)) return false;
+
         return true;
     }
 
@@ -185,6 +187,21 @@ internal static class FreeLookController
         t.rotation = Quaternion.AngleAxis(_yawOffset, Vector3.up) * t.rotation;
         _lastWritten = t.rotation;
         _haveWritten = true;
+    }
+
+    private static Transform _worldView;
+
+    private static bool CameraDetachedFromBody(vp_FPSCamera camera)
+    {
+        if (_worldView == null)
+        {
+            var player = Il2Cpp.GameManager.GetTopLevelCharacterFpsPlayer();
+            if (player == null) return false;
+            _worldView = player.transform.Find("WorldView");
+            if (_worldView == null) return false;
+        }
+
+        return Mathf.Abs(Mathf.DeltaAngle(_worldView.eulerAngles.y, camera.m_Yaw)) > 1f;
     }
 
     private static bool IsCrouching()
