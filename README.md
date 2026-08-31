@@ -6,7 +6,7 @@ Look around while you walk. Hold **Left Alt** and the camera swings away from th
 
 - The Long Dark (built against 2.55)
 - [MelonLoader](https://melonwiki.xyz/)
-- [ModSettings](https://github.com/DigitalzombieTLD/ModSettings) — optional. Without it the mod still works on its defaults; with it you get an in-game settings page.
+- [ModSettings](https://github.com/DigitalzombieTLD/ModSettings) - optional. Without it the mod still works on its defaults; with it you get an in-game settings page.
 
 ## Installation
 
@@ -26,7 +26,7 @@ Configurable in-game under **Mod Settings → Free Look**:
 | Return time                        | 150 ms   | How long the view takes to swing back once released. Zero snaps instantly.                                            |
 | Turn to face your aim              | On       | Raising a weapon while looking around turns you to face where you were looking, rather than swinging your view back.  |
 | Disable while aiming               | On       | Suppress free look while a weapon is raised, so your aim is never pointed somewhere you are not looking.              |
-| Show held item while looking       | Off      | Keep whatever is in your hands on screen while looking around. Expect visible cut-off edges — see below.              |
+| Show held item while looking       | Off      | Keep whatever is in your hands on screen while looking around. Expect visible cut-off edges - see below.              |
 | Hide beyond                        | 180°     | Used only when the held item is shown: how far you may look before it is hidden after all. At 180 it is never hidden. |
 | No free look with an item equipped | Off      | Stand down entirely whenever something is in your hands.                                                              |
 | No free look while crouched        | Off      | Stand down while crouched.                                                                                            |
@@ -34,7 +34,7 @@ Configurable in-game under **Mod Settings → Free Look**:
 ## Notes
 
 - Your first-person arms, clothing and held item are hidden while you look around, and restored when you release. The game only ever builds them to be seen from straight ahead, so from any other angle they show cut-off edges. **Show held item while looking** keeps your held tool or weapon on screen anyway, and **Hide beyond** sets how far round you may look before it is hidden after all.
-- When you let go, your view swings back to the way you are heading — both the sideways turn and any up or down you added along the way.
+- When you let go, your view swings back to the way you are heading - both the sideways turn and any up or down you added along the way.
 - Your character does not turn while free look is held, so movement continues in the direction you were already facing.
 - A latched free look is released whenever the game takes control: opening your inventory, the map or the pause menu, sleeping, or any scripted sequence.
 
