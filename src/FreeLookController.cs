@@ -73,15 +73,10 @@ internal static class FreeLookController
         {
             if (Input.GetKeyDown(Config.ModifierKey))
             {
-                if (_latched)
+                if (Time.unscaledTime - _lastTapTime <= DoubleTapWindow)
                 {
 
-                    _latched = false;
-                    _lastTapTime = -1f;
-                }
-                else if (Time.unscaledTime - _lastTapTime <= DoubleTapWindow)
-                {
-                    _latched = true;
+                    _latched = !_latched;
                     _lastTapTime = -1f;
                 }
                 else

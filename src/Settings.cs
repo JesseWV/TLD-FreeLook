@@ -34,7 +34,7 @@ internal sealed class Settings : JsonModSettings
     public bool ToggleMode = false;
 
     [Name("Double tap to latch")]
-    [Description("Holding still works as normal, but a quick double tap of the key latches free look on until you press it again. Useful on a long walk, where holding the key gets tiring.")]
+    [Description("Holding still works as normal, but a quick double tap latches free look on, and another double tap releases it. Useful on a long walk, and on a controller: every pad button is already bound, so pairing the presses cancels out whatever the button normally toggles.")]
     public bool DoubleTapLatch = false;
 
     [Section("Feel")]
