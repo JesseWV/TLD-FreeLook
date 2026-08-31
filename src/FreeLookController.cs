@@ -27,8 +27,6 @@ internal static class FreeLookController
 
     private static float _pitchVelocity;
 
-    internal static float YawOffset => _yawOffset;
-
     internal static void Reset()
     {
         ShowArms();
