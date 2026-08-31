@@ -63,10 +63,10 @@ internal static class FreeLookController
         {
             bool keyDown = Config.ModifierKey != KeyCode.None && Input.GetKey(Config.ModifierKey);
             bool latching = Config.ToggleMode || Config.DoubleTapLatch;
-            bool alsoAutoWalk = Config.AlsoUseAutoWalk;
+            bool ctrl = ControllerIsActive();
             bool autoWalk = false;
             if (_pollContext != null) autoWalk = Il2Cpp.InputManager.GetAutoWalkDown(_pollContext);
-            Core.Log.Msg($"TRIGGER key={keyDown} latchingMode={latching} alsoAutoWalk={alsoAutoWalk} autoWalk={autoWalk}");
+            Core.Log.Msg($"TRIGGER key={keyDown} latchingMode={latching} controllerActive={ctrl} autoWalk={autoWalk}");
         }
 
         if (!down && !pressed && !_latched)
@@ -116,8 +116,8 @@ internal static class FreeLookController
     {
         if (Config.ModifierKey != KeyCode.None && Input.GetKey(Config.ModifierKey)) return true;
 
-        if (!Config.AlsoUseAutoWalk) return false;
         if (!Config.ToggleMode && !Config.DoubleTapLatch) return false;
+        if (!ControllerIsActive()) return false;
 
         if (_pollContext == null) _pollContext = UnityEngine.Object.FindObjectOfType<vp_FPSCamera>();
         return _pollContext != null && Il2Cpp.InputManager.GetAutoWalkDown(_pollContext);
@@ -224,6 +224,14 @@ internal static class FreeLookController
         if (t == null) return false;
 
         return (t.position - player.position).sqrMagnitude > DetachedDistance * DetachedDistance;
+    }
+
+    private static bool ControllerIsActive()
+    {
+        var input = Il2Cpp.InputManager.m_InputSystem;
+        if (input == null) return false;
+
+        return input.m_LastActiveController != Il2Cpp.InputSystemRewired.ActiveControllerType.None;
     }
 
     private static bool IsCrouching()
