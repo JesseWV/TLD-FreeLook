@@ -39,6 +39,16 @@ Configurable in-game under **Mod Settings → Free Look**:
 - You can still interact with whatever you are looking at, so a locker or a bed off to one side can be used without cancelling free look first.
 - A latched free look is released whenever the game takes control: opening your inventory, the map or the pause menu, sleeping, or any scripted sequence.
 
+## Compatibility with other mods
+
+Free look stands down on its own whenever something else takes the camera, and picks up again afterwards. It does not need to know which mod did it: it watches for the camera behaving in ways that only happen when it is no longer yours, so this holds for tools that did not exist when this mod was written.
+
+[RecordingUtils](https://github.com/moosemeat817/RecordingUtils) by moosemeat817 is tested and works. While its FreeBird camera is flying, free look is completely inert, so your shot is exactly what FreeBird gives you, and leaving FreeBird restores normal behaviour with nothing left behind. Expect the same of other recording and free-camera tools, and please report it if you find one that misbehaves.
+
+The developer fly mode is handled too, with one rough edge: between entering fly mode and first moving the camera, free look can still engage, because nothing has yet happened that distinguishes flying from standing still. It releases as soon as you move.
+
+There are no known conflicts. Free look acts at a single point, the one where the game has already decided you are allowed to look, so anything upstream of that decision keeps its say.
+
 ## Credits
 
 Idea: **Zaknafein** - [Road to 500 Days - Part 100](https://youtu.be/KTwYDL6Oq-s?t=2702)
