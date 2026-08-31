@@ -15,6 +15,10 @@ internal static class FreeLookController
 
     private static float _lastTapTime = -1f;
 
+    private static bool _wasDown;
+
+    private static vp_FPSCamera _pollContext;
+
     private static float _yawOffset;
 
     private static float _returnVelocity;
@@ -51,7 +55,11 @@ internal static class FreeLookController
             return;
         }
 
-        if (Config.ModifierKey == KeyCode.None)
+        bool down = ModifierIsDown();
+        bool pressed = down && !_wasDown;
+        _wasDown = down;
+
+        if (!down && !pressed && !_latched)
         {
             _requested = false;
             return;
@@ -66,12 +74,12 @@ internal static class FreeLookController
 
         if (Config.ToggleMode)
         {
-            if (Input.GetKeyDown(Config.ModifierKey)) _latched = !_latched;
+            if (pressed) _latched = !_latched;
             _requested = _latched;
         }
         else if (Config.DoubleTapLatch)
         {
-            if (Input.GetKeyDown(Config.ModifierKey))
+            if (pressed)
             {
                 if (Time.unscaledTime - _lastTapTime <= DoubleTapWindow)
                 {
@@ -85,13 +93,24 @@ internal static class FreeLookController
                 }
             }
 
-            _requested = _latched || Input.GetKey(Config.ModifierKey);
+            _requested = _latched || down;
         }
         else
         {
             _latched = false;
-            _requested = Input.GetKey(Config.ModifierKey);
+            _requested = down;
         }
+    }
+
+    private static bool ModifierIsDown()
+    {
+        if (Config.UseAutoWalkButton)
+        {
+            if (_pollContext == null) _pollContext = UnityEngine.Object.FindObjectOfType<vp_FPSCamera>();
+            return _pollContext != null && Il2Cpp.InputManager.GetAutoWalkDown(_pollContext);
+        }
+
+        return Config.ModifierKey != KeyCode.None && Input.GetKey(Config.ModifierKey);
     }
 
     private static bool ShouldEngage(vp_FPSCamera camera)
