@@ -104,13 +104,12 @@ internal static class FreeLookController
 
     private static bool ModifierIsDown()
     {
-        if (Config.UseAutoWalkButton)
-        {
-            if (_pollContext == null) _pollContext = UnityEngine.Object.FindObjectOfType<vp_FPSCamera>();
-            return _pollContext != null && Il2Cpp.InputManager.GetAutoWalkDown(_pollContext);
-        }
+        if (Config.ModifierKey != KeyCode.None && Input.GetKey(Config.ModifierKey)) return true;
 
-        return Config.ModifierKey != KeyCode.None && Input.GetKey(Config.ModifierKey);
+        if (!Config.ToggleMode && !Config.DoubleTapLatch) return false;
+
+        if (_pollContext == null) _pollContext = UnityEngine.Object.FindObjectOfType<vp_FPSCamera>();
+        return _pollContext != null && Il2Cpp.InputManager.GetAutoWalkDown(_pollContext);
     }
 
     private static bool ShouldEngage(vp_FPSCamera camera)

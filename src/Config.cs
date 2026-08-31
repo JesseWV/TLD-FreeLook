@@ -8,8 +8,6 @@ internal static class Config
 
     internal static KeyCode ModifierKey = KeyCode.LeftAlt;
 
-    internal static bool UseAutoWalkButton = false;
-
     internal static bool ToggleMode = false;
 
     internal static bool DoubleTapLatch = false;
