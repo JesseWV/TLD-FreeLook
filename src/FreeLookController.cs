@@ -111,8 +111,6 @@ internal static class FreeLookController
 
         if (Config.DisableWhileCrouched && IsCrouching()) return false;
 
-        if (FlyModeActive()) return false;
-
         return true;
     }
 
@@ -187,11 +185,6 @@ internal static class FreeLookController
         t.rotation = Quaternion.AngleAxis(_yawOffset, Vector3.up) * t.rotation;
         _lastWritten = t.rotation;
         _haveWritten = true;
-    }
-
-    private static bool FlyModeActive()
-    {
-        return Il2Cpp.FlyMode.s_InputContext != null;
     }
 
     private static bool IsCrouching()
