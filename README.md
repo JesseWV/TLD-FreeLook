@@ -51,6 +51,7 @@ Your bare arms always hide immediately regardless, since there is no angle at wh
 - Only the horizontal swing is taken over. Vertical look is left entirely to the game, so its pitch limits, damping and weapon recoil behave exactly as they always did.
 - Free look stays out of the way during cutscenes, scripted animations and anything else where the game takes the camera, because it can only act at the point where the game has already decided you are allowed to look.
 - Your character does not turn while free look is held, so movement continues in the direction you were already facing.
+- A latched free look — from the toggle or the double tap — is released whenever the game takes control: opening your inventory, the map or the pause menu, sleeping, or any scripted sequence. You come back to normal movement rather than to a state you did not choose.
 
 ## Credits
 

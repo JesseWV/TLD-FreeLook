@@ -58,7 +58,8 @@ internal static class FreeLookController
             return;
         }
 
-        if (_latched && Il2Cpp.GameManager.ControlsLocked())
+        if (_latched && (Il2Cpp.GameManager.ControlsLocked()
+                         || Il2Cpp.InterfaceManager.IsOverlayActiveImmediate()))
         {
             _latched = false;
             _lastTapTime = -1f;
@@ -146,7 +147,9 @@ internal static class FreeLookController
             }
             else
             {
-                _yawOffset = Mathf.SmoothDamp(_yawOffset, 0f, ref _returnVelocity, Config.ReturnSeconds);
+
+                _yawOffset = Mathf.SmoothDamp(_yawOffset, 0f, ref _returnVelocity,
+                                              Config.ReturnSeconds, Mathf.Infinity, Time.unscaledDeltaTime);
                 if (Mathf.Abs(_yawOffset) < 0.01f)
                 {
                     _yawOffset = 0f;
@@ -209,7 +212,8 @@ internal static class FreeLookController
             return;
         }
 
-        float pitch = Mathf.SmoothDamp(camera.m_Pitch, _entryPitch, ref _pitchVelocity, Config.ReturnSeconds);
+        float pitch = Mathf.SmoothDamp(camera.m_Pitch, _entryPitch, ref _pitchVelocity,
+                                       Config.ReturnSeconds, Mathf.Infinity, Time.unscaledDeltaTime);
 
         if (Mathf.Abs(pitch - _entryPitch) < 0.05f)
         {
