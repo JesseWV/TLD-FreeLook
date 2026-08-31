@@ -40,4 +40,4 @@ Configurable in-game under **Mod Settings → Free Look**:
 
 ## Credits
 
-Idea: **Zaknafein** — [Road to 500 Days - Part 100!!! Bunker - Hushed River Valley](https://youtu.be/KTwYDL6Oq-s?t=2702)
+Idea: **Zaknafein** — [Road to 500 Days - Part 100](https://youtu.be/KTwYDL6Oq-s?t=2702)
