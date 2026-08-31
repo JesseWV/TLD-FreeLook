@@ -36,6 +36,7 @@ Configurable in-game under **Mod Settings → Free Look**:
 - Your first-person arms, clothing and held item are hidden while you look around, and restored when you release. The game only ever builds them to be seen from straight ahead, so from any other angle they show cut-off edges. **Show held item while looking** keeps your held tool or weapon on screen anyway, and **Hide beyond** sets how far round you may look before it is hidden after all.
 - When you let go, your view swings back to the way you are heading - both the sideways turn and any up or down you added along the way.
 - Your character does not turn while free look is held, so movement continues in the direction you were already facing.
+- You can still interact with whatever you are looking at, so a locker or a bed off to one side can be used without cancelling free look first.
 - A latched free look is released whenever the game takes control: opening your inventory, the map or the pause menu, sleeping, or any scripted sequence.
 
 ## Credits
