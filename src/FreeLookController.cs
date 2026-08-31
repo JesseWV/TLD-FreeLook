@@ -189,19 +189,17 @@ internal static class FreeLookController
         _haveWritten = true;
     }
 
-    private static Transform _worldView;
+    private const float DetachedDistance = 5f;
 
     private static bool CameraDetachedFromBody(vp_FPSCamera camera)
     {
-        if (_worldView == null)
-        {
-            var player = Il2Cpp.GameManager.GetTopLevelCharacterFpsPlayer();
-            if (player == null) return false;
-            _worldView = player.transform.Find("WorldView");
-            if (_worldView == null) return false;
-        }
+        var player = Il2Cpp.GameManager.GetPlayerTransform();
+        if (player == null) return false;
 
-        return Mathf.Abs(Mathf.DeltaAngle(_worldView.eulerAngles.y, camera.m_Yaw)) > 1f;
+        Transform t = camera.transform;
+        if (t == null) return false;
+
+        return (t.position - player.position).sqrMagnitude > DetachedDistance * DetachedDistance;
     }
 
     private static bool IsCrouching()
