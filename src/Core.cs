@@ -47,10 +47,12 @@ public class Core : MelonMod
 
     private static void WarnIfMissing(string method)
     {
-        var found = typeof(Il2Cpp.vp_FPSCamera).GetMethod(method,
-            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
-        if (found == null)
+        bool found = typeof(Il2Cpp.vp_FPSCamera)
+            .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .Any(m => m.Name == method);
+
+        if (!found)
             Log.Error($"vp_FPSCamera.{method} not found - free look is NOT active. " +
                       "The game version is probably newer than this mod supports.");
         else if (Config.Verbose)

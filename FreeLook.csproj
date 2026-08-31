@@ -7,10 +7,8 @@
     <RootNamespace>FreeLook</RootNamespace>
     <AssemblyName>FreeLook</AssemblyName>
     <LangVersion>latest</LangVersion>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
-    <Platforms>AnyCPU;x64</Platforms>
     <DebugType>none</DebugType>
   </PropertyGroup>
 

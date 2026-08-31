@@ -117,16 +117,13 @@ internal sealed class Settings : JsonModSettings
     protected override void OnChange(FieldInfo field, object oldValue, object newValue)
     {
         ApplyVisibility();
-        Push();
-
-        if (field.Name == nameof(ModifierKey) || field.Name == nameof(ToggleMode)
-            || field.Name == nameof(DoubleTapLatch) || field.Name == nameof(EnableMod))
-            FreeLookController.Reset();
     }
 
     protected override void OnConfirm()
     {
         base.OnConfirm();
         Push();
+
+        FreeLookController.Reset();
     }
 }

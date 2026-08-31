@@ -232,6 +232,8 @@ internal static class FreeLookController
 
     private const float RevealAngle = 8f;
 
+    private const float MaxLookAngle = 180f;
+
     private static void TurnBodyToAim(vp_FPSCamera camera, bool engaged)
     {
         if (engaged || !_wasEngaged || _yawOffset == 0f) return;
@@ -276,6 +278,8 @@ internal static class FreeLookController
 
         if (!Config.ShowHeldItem) return true;
 
+        if (Config.HideBeyond >= MaxLookAngle) return false;
+
         return Mathf.Abs(_yawOffset) >= Config.HideBeyond;
     }
 
@@ -293,7 +297,7 @@ internal static class FreeLookController
 
         if (wantHidden)
         {
-            var wc = ResolveWeaponCamera();
+            var wc = ResolveWeaponCamera(camera);
             if (wc == null) return;
 
             _savedCullingMask = wc.cullingMask;
@@ -311,14 +315,12 @@ internal static class FreeLookController
         }
     }
 
-    private static Camera ResolveWeaponCamera()
+    private static Camera ResolveWeaponCamera(vp_FPSCamera camera)
     {
         if (_weaponCam != null) return _weaponCam;
+        if (camera == null) return null;
 
-        var cam = UnityEngine.Object.FindObjectOfType<vp_FPSCamera>();
-        if (cam == null) return null;
-
-        _weaponCam = cam.GetWeaponCamera();
+        _weaponCam = camera.GetWeaponCamera();
         return _weaponCam;
     }
 
