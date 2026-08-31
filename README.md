@@ -16,20 +16,20 @@ Drop `FreeLook.dll` into the game's `Mods` folder.
 
 Configurable in-game under **Mod Settings → Free Look**:
 
-| Setting | Default | What it does |
-|---|---|---|
-| Enable free look | On | Turn the whole feature off and restore stock camera behaviour. |
-| Free look key | Left Alt | The key held to look around. A mouse button works too. |
-| Toggle instead of hold | Off | Tap to enter free look and tap again to leave, rather than holding. |
-| Double tap to latch | Off | Holding still works, but a quick double tap latches free look on until you press again. |
-| Look range | 155° | How far the view may swing from your direction of travel, to each side. |
-| Return time | 150 ms | How long the view takes to swing back once released. Zero snaps instantly. |
-| Turn to face your aim | On | Raising a weapon while looking around turns you to face where you were looking, rather than swinging your view back. |
-| Disable while aiming | On | Suppress free look while a weapon is raised, so your aim is never pointed somewhere you are not looking. |
-| Show held item while looking | Off | Keep whatever is in your hands on screen while looking around. Expect visible cut-off edges — see below. |
-| Hide beyond | 180° | Used only when the held item is shown: how far you may look before it is hidden after all. At 180 it is never hidden. |
-| No free look with an item equipped | Off | Stand down entirely whenever something is in your hands. |
-| No free look while crouched | Off | Stand down while crouched. |
+| Setting                            | Default  | What it does                                                                                                          |
+| ---------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------- |
+| Enable free look                   | On       | Turn the whole feature off and restore stock camera behaviour.                                                        |
+| Free look key                      | Left Alt | The key held to look around. A mouse button works too.                                                                |
+| Toggle instead of hold             | Off      | Tap to enter free look and tap again to leave, rather than holding.                                                   |
+| Double tap to latch                | Off      | Holding still works, but a quick double tap latches free look on until you press again.                               |
+| Look range                         | 155°     | How far the view may swing from your direction of travel, to each side.                                               |
+| Return time                        | 150 ms   | How long the view takes to swing back once released. Zero snaps instantly.                                            |
+| Turn to face your aim              | On       | Raising a weapon while looking around turns you to face where you were looking, rather than swinging your view back.  |
+| Disable while aiming               | On       | Suppress free look while a weapon is raised, so your aim is never pointed somewhere you are not looking.              |
+| Show held item while looking       | Off      | Keep whatever is in your hands on screen while looking around. Expect visible cut-off edges — see below.              |
+| Hide beyond                        | 180°     | Used only when the held item is shown: how far you may look before it is hidden after all. At 180 it is never hidden. |
+| No free look with an item equipped | Off      | Stand down entirely whenever something is in your hands.                                                              |
+| No free look while crouched        | Off      | Stand down while crouched.                                                                                            |
 
 ## Notes
 
@@ -41,3 +41,5 @@ Configurable in-game under **Mod Settings → Free Look**:
 ## Credits
 
 By **Lycanthor**.
+
+Idea: **Zaknafein** — https://youtu.be/KTwYDL6Oq-s?t=2702
