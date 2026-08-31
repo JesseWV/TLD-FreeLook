@@ -29,6 +29,10 @@ internal sealed class Settings : JsonModSettings
     [Description("Held down to look around. Left Alt is the usual binding for this in other games. None = off.")]
     public KeyCode ModifierKey = KeyCode.LeftAlt;
 
+    [Name("Also use the auto-walk control")]
+    [Description("For playing on a controller. Gamepad buttons are not keys and cannot be picked above, so free look can also be triggered by the game's own auto-walk control, which on a pad is the left stick click. Needs one of the latching modes below. Leave this off when playing on a keyboard, or double tapping auto-walk will latch free look.")]
+    public bool AlsoUseAutoWalk = false;
+
     [Name("Toggle instead of hold")]
     [Description("Tap the key to enter free look and tap again to leave, rather than holding it down. Handy for long walks, but it is easy to forget you left it on.")]
     public bool ToggleMode = false;
@@ -88,6 +92,7 @@ internal sealed class Settings : JsonModSettings
     {
         Config.EnableMod = EnableMod;
         Config.ModifierKey = ModifierKey;
+        Config.AlsoUseAutoWalk = AlsoUseAutoWalk;
         Config.ToggleMode = ToggleMode;
         Config.DoubleTapLatch = DoubleTapLatch;
         Config.YawLimit = Mathf.Round(YawLimit);

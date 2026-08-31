@@ -59,6 +59,16 @@ internal static class FreeLookController
         bool pressed = down && !_wasDown;
         _wasDown = down;
 
+        if (Config.Verbose && pressed)
+        {
+            bool keyDown = Config.ModifierKey != KeyCode.None && Input.GetKey(Config.ModifierKey);
+            bool latching = Config.ToggleMode || Config.DoubleTapLatch;
+            bool alsoAutoWalk = Config.AlsoUseAutoWalk;
+            bool autoWalk = false;
+            if (_pollContext != null) autoWalk = Il2Cpp.InputManager.GetAutoWalkDown(_pollContext);
+            Core.Log.Msg($"TRIGGER key={keyDown} latchingMode={latching} alsoAutoWalk={alsoAutoWalk} autoWalk={autoWalk}");
+        }
+
         if (!down && !pressed && !_latched)
         {
             _requested = false;
@@ -106,8 +116,8 @@ internal static class FreeLookController
     {
         if (Config.ModifierKey != KeyCode.None && Input.GetKey(Config.ModifierKey)) return true;
 
+        if (!Config.AlsoUseAutoWalk) return false;
         if (!Config.ToggleMode && !Config.DoubleTapLatch) return false;
-        if (!Il2Cpp.InputManager.CheckForActiveController()) return false;
 
         if (_pollContext == null) _pollContext = UnityEngine.Object.FindObjectOfType<vp_FPSCamera>();
         return _pollContext != null && Il2Cpp.InputManager.GetAutoWalkDown(_pollContext);
