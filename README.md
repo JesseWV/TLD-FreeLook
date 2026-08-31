@@ -40,6 +40,4 @@ Configurable in-game under **Mod Settings → Free Look**:
 
 ## Credits
 
-By **Lycanthor**.
-
 Idea: **Zaknafein** — https://youtu.be/KTwYDL6Oq-s?t=2702
