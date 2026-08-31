@@ -46,7 +46,8 @@ internal static class FreeLookController
     {
         if (!Config.EnableMod)
         {
-            if (_yawOffset != 0f || _latched || _requested) Reset();
+
+            if (_yawOffset != 0f || _latched || _requested || _maskCleared) Reset();
             return;
         }
 
