@@ -33,7 +33,7 @@ Configurable in-game under **Mod Settings → Free Look**:
 
 ### The indicator
 
-Using any latching setting such as **Toggle instead of hold** or **Double tap to latch**, will cause a small latched indicator icon appears in the bottom right near the crouching icon area. It's position and size can be adjusted to accomodate other HUD mods.
+Using any latching setting such as **Toggle instead of hold** or **Double tap to latch**, will cause a small latched indicator icon to appear in the bottom right near the crouching icon area. Its position and size can be adjusted to accommodate other HUD mods.
 
 ## Notes
 
