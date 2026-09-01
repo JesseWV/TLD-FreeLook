@@ -170,6 +170,14 @@ internal static class FreeLookController
 
         TurnBodyToAim(camera, engaged);
 
+        if (_latched && Config.DisableWhileAiming && camera.IsZoomed)
+        {
+            _latched = false;
+            _requested = false;
+            _lastTapTime = -1f;
+            if (Config.Verbose) Core.Log.Msg("weapon raised - latched free look released");
+        }
+
         if (engaged)
         {
 
