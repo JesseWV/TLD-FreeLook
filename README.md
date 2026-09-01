@@ -33,9 +33,11 @@ Configurable in-game under **Mod Settings → Free Look**:
 
 ### The indicator
 
-Free look can be latched, and a latch outlives the key press. So there is a small icon on the interface to say so, sitting by default beside the stamina meter in the bottom right.
+If you turn on **Toggle instead of hold** or **Double tap to latch**, free look can be latched on, and a latch outlives the key press. That is the state worth announcing, so there is a small icon on the interface to say so, sitting by default beside the stamina meter in the bottom right.
 
-By default it appears only while free look is **latched**, not while you are holding the key, on the grounds that a key under your finger is not something you forget. If you would rather see it whenever you are looking around, or never, that is one setting. Its corner, position, size and opacity are all adjustable, and it keeps the same place on any monitor and aspect ratio.
+**On the default hold-only binding it never appears**, which is deliberate: a key under your finger is not one you forget. Set **Show an icon** to Whenever looking if you want it on the hold as well.
+
+The choices are Never, While latched, or Whenever looking. Its corner, position, size and opacity are all adjustable, and it keeps the same place on any monitor and aspect ratio.
 
 It is built from the game's own interface art and lives inside the game's own interface, so it hides with everything else in menus, on the map, during cutscenes, and in screenshots taken with F10.
 
