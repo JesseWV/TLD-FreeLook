@@ -1,6 +1,6 @@
 # Free Look
 
-Look around while you walk. Hold **Left Alt** and the camera swings away from the direction you are travelling without turning your character, so you can watch a wolf on your flank or take in the view while still walking a straight line. Let go and the view swings smoothly back to where you are heading.
+Look around while you walk. Hold **Left Alt** and the camera swings away from the direction you are traveling without turning your character, so you can watch a wolf on your flank or take in the view while still walking a straight line. Let go and the view swings smoothly back to where you are heading.
 
 ## Requirements
 
@@ -18,7 +18,7 @@ Configurable in-game under **Mod Settings → Free Look**:
 
 | Setting                            | Default  | What it does                                                                                                          |
 | ---------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------- |
-| Enable free look                   | On       | Turn the whole feature off and restore stock camera behaviour.                                                        |
+| Enable free look                   | On       | Turn the whole feature off and restore stock camera behavior.                                                        |
 | Free look key                      | Left Alt | The key held to look around. A mouse button works too.                                                                |
 | Toggle instead of hold             | Off      | Tap to enter free look and tap again to leave, rather than holding.                                                   |
 | Double tap to latch                | Off      | Holding still works, but a quick double tap latches free look on, and another releases it.                            |
