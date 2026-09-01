@@ -4,7 +4,7 @@ using System.Reflection;
 using FreeLook;
 using MelonLoader;
 
-[assembly: MelonInfo(typeof(Core), "FreeLook", "1.0.0", "Lycanthor")]
+[assembly: MelonInfo(typeof(Core), "FreeLook", "1.1.0", "Lycanthor")]
 [assembly: MelonGame("Hinterland", "TheLongDark")]
 [assembly: MelonOptionalDependencies("ModSettings")]
 
@@ -61,5 +61,10 @@ public class Core : MelonMod
 
     public override void OnUpdate() => FreeLookController.PollInput();
 
-    public override void OnSceneWasUnloaded(int buildIndex, string sceneName) => FreeLookController.Reset();
+    public override void OnSceneWasUnloaded(int buildIndex, string sceneName)
+    {
+        FreeLookController.Reset();
+
+        Indicator.Reset();
+    }
 }

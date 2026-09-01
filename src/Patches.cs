@@ -21,3 +21,12 @@ internal static class Patch_vp_FPSCamera_DoLateUpdate
         FreeLookController.ApplyToCamera(__instance);
     }
 }
+
+[HarmonyPatch(typeof(Panel_HUD), nameof(Panel_HUD.Update))]
+internal static class Patch_Panel_HUD_Update
+{
+    private static void Postfix(Panel_HUD __instance)
+    {
+        Indicator.Refresh(__instance);
+    }
+}

@@ -42,6 +42,8 @@ internal static class FreeLookController
         _yawOffset = 0f;
         _returnVelocity = 0f;
         _wasEngaged = false;
+        _indicatorEngaged = false;
+        _indicatorLatched = false;
         _pitchReturning = false;
         _pitchVelocity = 0f;
     }
@@ -123,6 +125,16 @@ internal static class FreeLookController
         return _pollContext != null && Il2Cpp.InputManager.GetAutoWalkDown(_pollContext);
     }
 
+    private static bool _indicatorEngaged;
+    private static bool _indicatorLatched;
+    private static float _indicatorStamp = -999f;
+
+    private static bool LookStateFresh => Time.unscaledTime - _indicatorStamp < 0.5f;
+
+    internal static bool LookEngagedLive => _indicatorEngaged && LookStateFresh;
+
+    internal static bool LookLatchedLive => _indicatorLatched && LookStateFresh;
+
     private static bool ShouldEngage(vp_FPSCamera camera)
     {
         if (!Config.EnableMod || !_requested || camera == null) return false;
@@ -190,6 +202,10 @@ internal static class FreeLookController
         if (Config.Verbose && engaged != _wasEngaged)
             Core.Log.Msg($"free look {(engaged ? "engaged" : "released")} (offset {_yawOffset:0.0} deg)");
         _wasEngaged = engaged;
+
+        _indicatorEngaged = engaged;
+        _indicatorLatched = engaged && _latched;
+        _indicatorStamp = Time.unscaledTime;
 
         if (_yawOffset == 0f)
         {

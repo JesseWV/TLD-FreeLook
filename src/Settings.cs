@@ -66,6 +66,36 @@ internal sealed class Settings : JsonModSettings
     [Slider(0f, 180f, 181, NumberFormat = "{0:0}°")]
     public float HideBeyond = 180f;
 
+    [Section("Indicator")]
+    [Name("Show an icon")]
+    [Description("When to put a small icon on the HUD. Latched means the toggle or a double tap, the states that survive letting go of the key and can be walked away from. Holding shows nothing under that setting, since your finger is already on the key. The icon hides with the rest of the interface in menus, cutscenes and screenshots.")]
+    [Choice("Never", "While latched", "Whenever looking")]
+    public IndicatorVisibility IndicatorMode = IndicatorVisibility.WhenLatched;
+
+    [Name("Icon corner")]
+    [Description("Which corner of the screen the icon is positioned from. It keeps the same distance from that corner on every monitor and aspect ratio, which is how the game places its own interface.")]
+    public IndicatorCorner IndicatorAnchor = IndicatorCorner.BottomRight;
+
+    [Name("Icon across")]
+    [Description("Distance from the chosen corner, left to right. Negative moves left, positive right. The default sits right of the stamina meter, clear of the crouch icon.")]
+    [Slider(-600f, 600f, 121, NumberFormat = "{0:0}")]
+    public float IndicatorOffsetX = -40f;
+
+    [Name("Icon up")]
+    [Description("Distance from the chosen corner, bottom to top. Negative moves down, positive up.")]
+    [Slider(-360f, 360f, 121, NumberFormat = "{0:0}")]
+    public float IndicatorOffsetY = 48f;
+
+    [Name("Icon size")]
+    [Description("Height of the icon on a 720 tall interface, so it scales with the game's own interface rather than with your resolution.")]
+    [Slider(16f, 96f, 81, NumberFormat = "{0:0}")]
+    public float IndicatorSize = 60f;
+
+    [Name("Icon opacity")]
+    [Description("How strongly the icon is drawn. The interface house style is restrained, so full strength shouts.")]
+    [Slider(0.2f, 1f, 17, NumberFormat = "{0:0.00}")]
+    public float IndicatorOpacity = 1f;
+
     [Section("Locks")]
     [Name("No free look with an item equipped")]
     [Description("Stand down entirely whenever something is in your hands, rather than hiding it.")]
@@ -74,6 +104,10 @@ internal sealed class Settings : JsonModSettings
     [Name("No free look while crouched")]
     [Description("Stand down while crouched, where the view is already restricted.")]
     public bool DisableWhileCrouched = false;
+
+    [Name("Indicator overlay scale")]
+    [Description("Hidden - edit the settings JSON.")]
+    public float IndicatorOverScale = 0.70f;
 
     [Name("Show diagnostics")]
     [Description("Hidden gate - edit the settings JSON to enable.")]
@@ -98,11 +132,27 @@ internal sealed class Settings : JsonModSettings
         Config.HideBeyond = Mathf.Round(HideBeyond);
         Config.DisableWhenEquipped = DisableWhenEquipped;
         Config.DisableWhileCrouched = DisableWhileCrouched;
+        Config.IndicatorMode = IndicatorMode;
+        Config.IndicatorOverScale = IndicatorOverScale;
+        Config.IndicatorAnchor = IndicatorAnchor;
+        Config.IndicatorOffsetX = IndicatorOffsetX;
+        Config.IndicatorOffsetY = IndicatorOffsetY;
+        Config.IndicatorSize = Mathf.RoundToInt(IndicatorSize);
+        Config.IndicatorOpacity = IndicatorOpacity;
         Config.Verbose = Verbose;
     }
 
     internal void ApplyVisibility()
     {
+
+        SetFieldVisible(nameof(IndicatorOverScale), false);
+
+        SetFieldVisible(nameof(IndicatorAnchor), IndicatorMode != IndicatorVisibility.Never);
+        SetFieldVisible(nameof(IndicatorOffsetX), IndicatorMode != IndicatorVisibility.Never);
+        SetFieldVisible(nameof(IndicatorOffsetY), IndicatorMode != IndicatorVisibility.Never);
+        SetFieldVisible(nameof(IndicatorSize), IndicatorMode != IndicatorVisibility.Never);
+        SetFieldVisible(nameof(IndicatorOpacity), IndicatorMode != IndicatorVisibility.Never);
+
         SetFieldVisible(nameof(ShowDiagnostics), false);
         SetFieldVisible(nameof(Verbose), ShowDiagnostics);
 

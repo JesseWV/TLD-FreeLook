@@ -2,6 +2,10 @@ using UnityEngine;
 
 namespace FreeLook;
 
+public enum IndicatorCorner { BottomRight, BottomLeft, TopRight, TopLeft, Centre }
+
+public enum IndicatorVisibility { Never, WhenLatched, WhenLooking }
+
 internal static class Config
 {
     internal static bool EnableMod = true;
@@ -15,6 +19,23 @@ internal static class Config
     internal static float YawLimit = 155f;
 
     internal static float ReturnSeconds = 0.15f;
+
+    internal static IndicatorVisibility IndicatorMode = IndicatorVisibility.WhenLatched;
+
+    internal static string IndicatorSprite = "ico_ToD_arrow";
+
+    internal static string IndicatorSpriteOver = "ico_status_fatigue1";
+
+    internal static float IndicatorOverScale = 0.70f;
+
+    internal static IndicatorCorner IndicatorAnchor = IndicatorCorner.BottomRight;
+
+    internal static float IndicatorOffsetX = -40f;
+    internal static float IndicatorOffsetY = 48f;
+
+    internal static int IndicatorSize = 60;
+
+    internal static float IndicatorOpacity = 1f;
 
     internal static bool DisableWhileAiming = true;
 

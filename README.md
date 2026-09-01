@@ -31,6 +31,14 @@ Configurable in-game under **Mod Settings → Free Look**:
 | No free look with an item equipped | Off      | Stand down entirely whenever something is in your hands.                                                              |
 | No free look while crouched        | Off      | Stand down while crouched.                                                                                            |
 
+### The indicator
+
+Free look can be latched, and a latch outlives the key press. So there is a small icon on the interface to say so, sitting by default beside the stamina meter in the bottom right.
+
+By default it appears only while free look is **latched**, not while you are holding the key, on the grounds that a key under your finger is not something you forget. If you would rather see it whenever you are looking around, or never, that is one setting. Its corner, position, size and opacity are all adjustable, and it keeps the same place on any monitor and aspect ratio.
+
+It is built from the game's own interface art and lives inside the game's own interface, so it hides with everything else in menus, on the map, during cutscenes, and in screenshots taken with F10.
+
 ## Notes
 
 - Your first-person arms, clothing and held item are hidden while you look around, and restored when you release. The game only ever builds them to be seen from straight ahead, so from any other angle they show cut-off edges. **Show held item while looking** keeps your held tool or weapon on screen anyway, and **Hide beyond** sets how far round you may look before it is hidden after all.
