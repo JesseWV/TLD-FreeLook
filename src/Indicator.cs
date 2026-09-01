@@ -110,9 +110,10 @@ internal static class Indicator
         ApplyPosition();
         _root.SetActive(false);
 
-        Core.Log.Msg($"indicator built: '{Config.IndicatorSprite}' + '{Config.IndicatorSpriteOver}' " +
-                     $"at {Config.HorizontalOffset:0.00}% x {Config.VerticalOffset:0.00}% " +
-                     $"in from {Config.ScreenAnchor}, height {Config.IconSize}");
+        if (Config.Verbose)
+            Core.Log.Msg($"indicator built: '{Config.IndicatorSprite}' + '{Config.IndicatorSpriteOver}' " +
+                         $"at {Config.HorizontalOffset:0.00}% x {Config.VerticalOffset:0.00}% " +
+                         $"in from {Config.ScreenAnchor}, height {Config.IconSize}");
         return true;
     }
 
