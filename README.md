@@ -21,7 +21,7 @@ Configurable in-game under **Mod Settings → Free Look**:
 | Enable free look                   | On       | Turn the whole feature off and restore stock camera behaviour.                                                        |
 | Free look key                      | Left Alt | The key held to look around. A mouse button works too.                                                                |
 | Toggle instead of hold             | Off      | Tap to enter free look and tap again to leave, rather than holding.                                                   |
-| Double tap to latch                | Off      | Holding still works, but a quick double tap latches free look on, and another releases it.                               |
+| Double tap to latch                | Off      | Holding still works, but a quick double tap latches free look on, and another releases it.                            |
 | Look range                         | 155°     | How far the view may swing from your direction of travel, to each side.                                               |
 | Return time                        | 150 ms   | How long the view takes to swing back once released. Zero snaps instantly.                                            |
 | Turn to face your aim              | On       | Raising a weapon while looking around turns you to face where you were looking, rather than swinging your view back.  |
@@ -33,27 +33,25 @@ Configurable in-game under **Mod Settings → Free Look**:
 
 ### The indicator
 
-Turn on **Toggle instead of hold** or **Double tap to latch**, and a small icon appears in the bottom right whenever free look is latched. On the default hold-only binding nothing is drawn.
-
-It uses the game's own interface art and hides with the rest of the interface: menus, the map, cutscenes, and F10 screenshots. Its corner, position, size and opacity are adjustable, and it keeps its place on any monitor or aspect ratio.
+Using any latching setting such as **Toggle instead of hold** or **Double tap to latch**, will cause a small latched indicator icon appears in the bottom right near the crouching icon area. It's position and size can be adjusted to accomodate other HUD mods.
 
 ## Notes
 
-- **By default** your first-person arms, clothing and held item are hidden while you look around, and restored when you release. The game only ever builds them to be seen from straight ahead, so from any other angle they show cut-off edges. Turn on **Show held item while looking** to keep your held tool or weapon on screen anyway; **Hide beyond** then sets how far round you may look before it is taken away after all, and at its default of 180 it never is. Your bare hands always hide regardless, since there is no angle at which a bare arm looks right.
-- When you let go, your view swings back to the way you are heading - both the sideways turn and any up or down you added along the way.
-- Your character does not turn while free look is held, so movement continues in the direction you were already facing.
+- The first-person arms, clothing, and held item were only ever built to be seen from straight ahead. If you chose to  show them by turning on **Show held item while looking**, be aware they will appear incomplete resulting in cut-off and/or clipping. You can also selectively hide them by changing **Hide beyond** to set how far you may look before they are hidden. Set it to 180 and they are always shown, glitches and all. 
 - You can still interact with whatever you are looking at, so a locker or a bed off to one side can be used without cancelling free look first.
 - A latched free look is released whenever the game takes control: opening your inventory, the map or the pause menu, sleeping, or any scripted sequence.
 
+## Using a controller
+
+Gamepad buttons cannot be chosen in **Free look key**, because the game already binds every one of them. Turn on **Double tap to latch** instead: once you are playing on a controller, the game's own auto-walk control triggers free look as well. On a pad that is the left stick click, pressed without your thumb leaving the movement stick.
+
+Auto-walk is a toggle, so the two presses of a double tap leave it exactly as they found it. Single presses drive auto-walk, pairs drive free look, in any order, without either disturbing the other. Once free look is latched you have movement on one stick and looking on the other, with nothing held down.
+
+Your keyboard key keeps working throughout, and none of this applies until a controller has actually been used, so keyboard play is unaffected.
+
 ## Compatibility with other mods
 
-Free look stands down on its own whenever something else takes the camera, and picks up again afterwards. It does not need to know which mod did it: it watches for the camera behaving in ways that only happen when it is no longer yours, so this holds for tools that did not exist when this mod was written.
-
-[RecordingUtils](https://github.com/moosemeat817/RecordingUtils) by moosemeat817 is tested and works. While its FreeBird camera is flying, free look is completely inert, so your shot is exactly what FreeBird gives you, and leaving FreeBird restores normal behaviour with nothing left behind. Expect the same of other recording and free-camera tools, and please report it if you find one that misbehaves.
-
-The developer fly mode is handled too, with one rough edge: between entering fly mode and first moving the camera, free look can still engage, because nothing has yet happened that distinguishes flying from standing still. It releases as soon as you move.
-
-There are no known conflicts. Free look acts at a single point, the one where the game has already decided you are allowed to look, so anything upstream of that decision keeps its say.
+Free look stands down on its own whenever something else takes the camera, and picks up again afterwards. It does not need to know which mod did it: it watches for the camera behaving in ways that only happen when it is no longer yours, so this holds for tools that did not exist when this mod was written. There are no known conflicts. 
 
 ## Credits
 
