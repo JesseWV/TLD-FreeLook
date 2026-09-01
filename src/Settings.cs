@@ -22,7 +22,7 @@ internal sealed class Settings : JsonModSettings
 
     [Section("General")]
     [Name("Enable free look")]
-    [Description("Hold the modifier key to look around without turning your character. Turning this off restores stock camera behaviour entirely.")]
+    [Description("Hold the modifier key to look around without turning your character. Turning this off restores stock camera behavior entirely.")]
     public bool EnableMod = true;
 
     [Name("Free look key")]
@@ -66,35 +66,35 @@ internal sealed class Settings : JsonModSettings
     [Slider(0f, 180f, 181, NumberFormat = "{0:0}°")]
     public float HideBeyond = 180f;
 
-    [Section("Indicator")]
-    [Name("Show an icon")]
-    [Description("When to put a small icon on the HUD. Latched means the toggle or a double tap, the states that survive letting go of the key and can be walked away from. Holding shows nothing under that setting, since your finger is already on the key. The icon hides with the rest of the interface in menus, cutscenes and screenshots.")]
-    [Choice("Never", "While latched", "Whenever looking")]
-    public IndicatorVisibility IndicatorMode = IndicatorVisibility.WhenLatched;
+    [Section("Indicator Icon")]
+    [Name("Show Icon")]
+    [Description("When to show the free look icon on the HUD:\nWhenever looking - when the key is held or latched\nWhile latched - only when free look is locked on with a latching option\nNever - do not show the icon at all")]
+    [Choice("Whenever looking", "While latched", "Never")]
+    public IndicatorVisibility ShowIcon = IndicatorVisibility.WhenLatched;
 
-    [Name("Icon corner")]
-    [Description("Which corner of the screen the icon is positioned from. It keeps the same distance from that corner on every monitor and aspect ratio, which is how the game places its own interface.")]
-    public IndicatorCorner IndicatorAnchor = IndicatorCorner.BottomRight;
+    [Name("Screen Anchor")]
+    [Description("Which corner the two offsets below are measured from. The icon keeps the same place relative to that corner on any monitor or aspect ratio.")]
+    public IndicatorCorner ScreenAnchor = IndicatorCorner.BottomRight;
 
-    [Name("Icon across")]
-    [Description("Distance from the chosen corner, left to right. Negative moves left, positive right. The default sits right of the stamina meter, clear of the crouch icon.")]
-    [Slider(-600f, 600f, 121, NumberFormat = "{0:0}")]
-    public float IndicatorOffsetX = -40f;
+    [Name("Horizontal Offset")]
+    [Description("How far away from that corner, as a percentage of the screen width. 0 in the specified corner, and 100 the opposite one. Round numbers reach the obvious places: 50 here and 50 below is the middle of the screen. One at 0 and the other at 50 is a middle edge.")]
+    [Slider(0f, 100f, 401, NumberFormat = "{0:0.00}%")]
+    public float HorizontalOffset = 3.25f;
 
-    [Name("Icon up")]
-    [Description("Distance from the chosen corner, bottom to top. Negative moves down, positive up.")]
-    [Slider(-360f, 360f, 121, NumberFormat = "{0:0}")]
-    public float IndicatorOffsetY = 54f;
+    [Name("Vertical Offset")]
+    [Description("How far away from that corner, as a percentage of the screen height. 0 in the specified corner, and 100 the opposite one.")]
+    [Slider(0f, 100f, 401, NumberFormat = "{0:0.00}%")]
+    public float VerticalOffset = 7.5f;
 
-    [Name("Icon size")]
-    [Description("Height of the icon on a 720 tall interface, so it scales with the game's own interface rather than with your resolution.")]
+    [Name("Size")]
+    [Description("Height of the icon on the game's interface, so it scales with the interface rather than with your resolution.")]
     [Slider(16f, 96f, 81, NumberFormat = "{0:0}")]
-    public float IndicatorSize = 50f;
+    public float IconSize = 50f;
 
-    [Name("Icon opacity")]
-    [Description("How strongly the icon is drawn. The interface house style is restrained, so full strength shouts.")]
+    [Name("Opacity")]
+    [Description("How strongly the icon is drawn. The game's own icons are slightly muted, so full strength makes this one stand out a little.")]
     [Slider(0.2f, 1f, 17, NumberFormat = "{0:0.00}")]
-    public float IndicatorOpacity = 1f;
+    public float IconOpacity = 1f;
 
     [Section("Locks")]
     [Name("No free look with an item equipped")]
@@ -107,7 +107,7 @@ internal sealed class Settings : JsonModSettings
 
     [Name("Indicator overlay scale")]
     [Description("Hidden - edit the settings JSON.")]
-    public float IndicatorOverScale = 0.70f;
+    public float IconOverlayScale = 0.70f;
 
     [Name("Show diagnostics")]
     [Description("Hidden gate - edit the settings JSON to enable.")]
@@ -132,26 +132,26 @@ internal sealed class Settings : JsonModSettings
         Config.HideBeyond = Mathf.Round(HideBeyond);
         Config.DisableWhenEquipped = DisableWhenEquipped;
         Config.DisableWhileCrouched = DisableWhileCrouched;
-        Config.IndicatorMode = IndicatorMode;
-        Config.IndicatorOverScale = IndicatorOverScale;
-        Config.IndicatorAnchor = IndicatorAnchor;
-        Config.IndicatorOffsetX = IndicatorOffsetX;
-        Config.IndicatorOffsetY = IndicatorOffsetY;
-        Config.IndicatorSize = Mathf.RoundToInt(IndicatorSize);
-        Config.IndicatorOpacity = IndicatorOpacity;
+        Config.ShowIcon = ShowIcon;
+        Config.IconOverlayScale = IconOverlayScale;
+        Config.ScreenAnchor = ScreenAnchor;
+        Config.HorizontalOffset = HorizontalOffset;
+        Config.VerticalOffset = VerticalOffset;
+        Config.IconSize = Mathf.RoundToInt(IconSize);
+        Config.IconOpacity = IconOpacity;
         Config.Verbose = Verbose;
     }
 
     internal void ApplyVisibility()
     {
 
-        SetFieldVisible(nameof(IndicatorOverScale), false);
+        SetFieldVisible(nameof(IconOverlayScale), false);
 
-        SetFieldVisible(nameof(IndicatorAnchor), IndicatorMode != IndicatorVisibility.Never);
-        SetFieldVisible(nameof(IndicatorOffsetX), IndicatorMode != IndicatorVisibility.Never);
-        SetFieldVisible(nameof(IndicatorOffsetY), IndicatorMode != IndicatorVisibility.Never);
-        SetFieldVisible(nameof(IndicatorSize), IndicatorMode != IndicatorVisibility.Never);
-        SetFieldVisible(nameof(IndicatorOpacity), IndicatorMode != IndicatorVisibility.Never);
+        SetFieldVisible(nameof(ScreenAnchor), ShowIcon != IndicatorVisibility.Never);
+        SetFieldVisible(nameof(HorizontalOffset), ShowIcon != IndicatorVisibility.Never);
+        SetFieldVisible(nameof(VerticalOffset), ShowIcon != IndicatorVisibility.Never);
+        SetFieldVisible(nameof(IconSize), ShowIcon != IndicatorVisibility.Never);
+        SetFieldVisible(nameof(IconOpacity), ShowIcon != IndicatorVisibility.Never);
 
         SetFieldVisible(nameof(ShowDiagnostics), false);
         SetFieldVisible(nameof(Verbose), ShowDiagnostics);

@@ -40,7 +40,7 @@ internal static class Indicator
     {
         try
         {
-            if (!Config.EnableMod || Config.IndicatorMode == IndicatorVisibility.Never)
+            if (!Config.EnableMod || Config.ShowIcon == IndicatorVisibility.Never)
             {
                 if (_root != null) _root.SetActive(false);
                 return;
@@ -49,16 +49,20 @@ internal static class Indicator
             if (_root == null && !Build(hud)) return;
 
             if (Screen.width != _placedW || Screen.height != _placedH
-                || Config.IndicatorOffsetX != _placedX || Config.IndicatorOffsetY != _placedY
-                || Config.IndicatorAnchor != _placedCorner)
+                || Config.HorizontalOffset != _placedX || Config.VerticalOffset != _placedY
+                || Config.ScreenAnchor != _placedCorner)
                 ApplyPosition();
 
-            if (Config.IndicatorSize != _sizedFor
-                || Config.IndicatorOverScale != _scaledFor
-                || Config.IndicatorOpacity != _tintedFor)
+            if (Config.IconSize != _sizedFor
+                || Config.IconOverlayScale != _scaledFor
+                || Config.IconOpacity != _tintedFor)
+            {
                 ApplyAppearance();
 
-            bool want = Config.IndicatorMode == IndicatorVisibility.WhenLooking
+                ApplyPosition();
+            }
+
+            bool want = Config.ShowIcon == IndicatorVisibility.WhenLooking
                 ? FreeLookController.LookEngagedLive
                 : FreeLookController.LookLatchedLive;
             if (_root.activeSelf != want) _root.SetActive(want);
@@ -67,7 +71,7 @@ internal static class Indicator
         {
 
             if (Config.Verbose) Core.Log.Warning("indicator refresh failed, disabling it: " + ex.Message);
-            Config.IndicatorMode = IndicatorVisibility.Never;
+            Config.ShowIcon = IndicatorVisibility.Never;
         }
     }
 
@@ -102,27 +106,38 @@ internal static class Indicator
 
         if (_back == null && _over == null) { _root = null; return false; }
 
-        ApplyPosition();
         ApplyAppearance();
+        ApplyPosition();
         _root.SetActive(false);
 
         Core.Log.Msg($"indicator built: '{Config.IndicatorSprite}' + '{Config.IndicatorSpriteOver}' " +
-                     $"at {Config.IndicatorAnchor} + ({Config.IndicatorOffsetX:0}, " +
-                     $"{Config.IndicatorOffsetY:0}) height {Config.IndicatorSize}");
+                     $"at {Config.HorizontalOffset:0.00}% x {Config.VerticalOffset:0.00}% " +
+                     $"in from {Config.ScreenAnchor}, height {Config.IconSize}");
         return true;
+    }
+
+    private static void IconHalfExtents(out float halfW, out float halfH)
+    {
+        float w = 0f, h = 0f;
+        if (_back != null) { w = Mathf.Max(w, _back.width); h = Mathf.Max(h, _back.height); }
+        if (_over != null) { w = Mathf.Max(w, _over.width); h = Mathf.Max(h, _over.height); }
+        if (w <= 0f) w = Config.IconSize;
+        if (h <= 0f) h = Config.IconSize;
+        halfW = w * 0.5f;
+        halfH = h * 0.5f;
     }
 
     private static void ApplyAppearance()
     {
         if (_root == null) return;
 
-        int h = Mathf.Max(1, Config.IndicatorSize);
+        int h = Mathf.Max(1, Config.IconSize);
         SizeLayer(_back, h);
-        SizeLayer(_over, Mathf.Max(1, Mathf.RoundToInt(h * Config.IndicatorOverScale)));
+        SizeLayer(_over, Mathf.Max(1, Mathf.RoundToInt(h * Config.IconOverlayScale)));
 
-        _sizedFor = Config.IndicatorSize;
-        _scaledFor = Config.IndicatorOverScale;
-        _tintedFor = Config.IndicatorOpacity;
+        _sizedFor = Config.IconSize;
+        _scaledFor = Config.IconOverlayScale;
+        _tintedFor = Config.IconOpacity;
     }
 
     private static void SizeLayer(UISprite sp, int height)
@@ -133,7 +148,7 @@ internal static class Indicator
         if (data != null && data.height > 0) aspect = (float)data.width / data.height;
         sp.height = height;
         sp.width = Mathf.Max(1, Mathf.RoundToInt(height * aspect));
-        sp.color = new Color(VanillaTint, VanillaTint, VanillaTint, Mathf.Clamp01(Config.IndicatorOpacity));
+        sp.color = new Color(VanillaTint, VanillaTint, VanillaTint, Mathf.Clamp01(Config.IconOpacity));
     }
 
     private static void ApplyPosition()
@@ -148,30 +163,33 @@ internal static class Indicator
         int sh = Mathf.Max(1, Screen.height);
         float w = h * ((float)sw / sh);
 
-        float cx = 0f, cy = 0f;
-        switch (Config.IndicatorAnchor)
+        float dx = Mathf.Clamp01(Config.HorizontalOffset / 100f) * w;
+        float dy = Mathf.Clamp01(Config.VerticalOffset / 100f) * h;
+
+        float x, y;
+        switch (Config.ScreenAnchor)
         {
-            case IndicatorCorner.BottomRight: cx =  w * 0.5f; cy = -h * 0.5f; break;
-            case IndicatorCorner.BottomLeft:  cx = -w * 0.5f; cy = -h * 0.5f; break;
-            case IndicatorCorner.TopRight:    cx =  w * 0.5f; cy =  h * 0.5f; break;
-            case IndicatorCorner.TopLeft:     cx = -w * 0.5f; cy =  h * 0.5f; break;
-            case IndicatorCorner.Centre:      cx = 0f;        cy = 0f;        break;
+            case IndicatorCorner.BottomLeft: x = -w * 0.5f + dx; y = -h * 0.5f + dy; break;
+            case IndicatorCorner.TopRight:   x =  w * 0.5f - dx; y =  h * 0.5f - dy; break;
+            case IndicatorCorner.TopLeft:    x = -w * 0.5f + dx; y =  h * 0.5f - dy; break;
+            default:                         x =  w * 0.5f - dx; y = -h * 0.5f + dy; break;
         }
 
-        float x = cx + Config.IndicatorOffsetX;
-        float y = cy + Config.IndicatorOffsetY;
+        float halfW, halfH;
+        IconHalfExtents(out halfW, out halfH);
 
-        x = Mathf.Clamp(x, -w * 0.5f + 8f, w * 0.5f - 8f);
-        y = Mathf.Clamp(y, -h * 0.5f + 8f, h * 0.5f - 8f);
+        x = (halfW * 2f >= w) ? 0f : Mathf.Clamp(x, -w * 0.5f + halfW, w * 0.5f - halfW);
+        y = (halfH * 2f >= h) ? 0f : Mathf.Clamp(y, -h * 0.5f + halfH, h * 0.5f - halfH);
 
         _root.transform.localPosition = new Vector3(Mathf.Round(x), Mathf.Round(y), 0f);
 
         _placedW = sw; _placedH = sh;
-        _placedX = Config.IndicatorOffsetX; _placedY = Config.IndicatorOffsetY;
-        _placedCorner = Config.IndicatorAnchor;
+        _placedX = Config.HorizontalOffset; _placedY = Config.VerticalOffset;
+        _placedCorner = Config.ScreenAnchor;
 
         if (Config.Verbose)
-            Core.Log.Msg($"indicator at ({x:0}, {y:0}) from {Config.IndicatorAnchor} " +
+            Core.Log.Msg($"indicator at ({x:0}, {y:0}), {Config.HorizontalOffset:0.00}% x " +
+                         $"{Config.VerticalOffset:0.00}% in from {Config.ScreenAnchor} " +
                          $"in a {w:0}x{h:0} canvas for a {sw}x{sh} screen");
     }
 

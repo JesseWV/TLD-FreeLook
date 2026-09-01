@@ -2,9 +2,9 @@ using UnityEngine;
 
 namespace FreeLook;
 
-public enum IndicatorCorner { BottomRight, BottomLeft, TopRight, TopLeft, Centre }
+public enum IndicatorCorner { BottomRight, BottomLeft, TopRight, TopLeft }
 
-public enum IndicatorVisibility { Never, WhenLatched, WhenLooking }
+public enum IndicatorVisibility { WhenLooking, WhenLatched, Never }
 
 internal static class Config
 {
@@ -20,22 +20,22 @@ internal static class Config
 
     internal static float ReturnSeconds = 0.15f;
 
-    internal static IndicatorVisibility IndicatorMode = IndicatorVisibility.WhenLatched;
+    internal static IndicatorVisibility ShowIcon = IndicatorVisibility.WhenLatched;
 
     internal static string IndicatorSprite = "ico_ToD_arrow";
 
     internal static string IndicatorSpriteOver = "ico_status_fatigue1";
 
-    internal static float IndicatorOverScale = 0.70f;
+    internal static float IconOverlayScale = 0.70f;
 
-    internal static IndicatorCorner IndicatorAnchor = IndicatorCorner.BottomRight;
+    internal static IndicatorCorner ScreenAnchor = IndicatorCorner.BottomRight;
 
-    internal static float IndicatorOffsetX = -40f;
-    internal static float IndicatorOffsetY = 54f;
+    internal static float HorizontalOffset = 3.25f;
+    internal static float VerticalOffset = 7.5f;
 
-    internal static int IndicatorSize = 50;
+    internal static int IconSize = 50;
 
-    internal static float IndicatorOpacity = 1f;
+    internal static float IconOpacity = 1f;
 
     internal static bool DisableWhileAiming = true;
 

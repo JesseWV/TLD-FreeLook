@@ -4,7 +4,7 @@ using System.Reflection;
 using FreeLook;
 using MelonLoader;
 
-[assembly: MelonInfo(typeof(Core), "FreeLook", "1.1.1", "Lycanthor")]
+[assembly: MelonInfo(typeof(Core), "FreeLook", "1.2.0", "Lycanthor")]
 [assembly: MelonGame("Hinterland", "TheLongDark")]
 [assembly: MelonOptionalDependencies("ModSettings")]
 

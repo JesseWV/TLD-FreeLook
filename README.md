@@ -38,7 +38,7 @@ Using any latching setting such as **Toggle instead of hold** or **Double tap to
 ## Notes
 
 - The first-person arms, clothing, and held item were only ever built to be seen from straight ahead. If you chose to  show them by turning on **Show held item while looking**, be aware they will appear incomplete resulting in cut-off and/or clipping. You can also selectively hide them by changing **Hide beyond** to set how far you may look before they are hidden. Set it to 180 and they are always shown, glitches and all. 
-- You can still interact with whatever you are looking at, so a locker or a bed off to one side can be used without cancelling free look first.
+- You can still interact with whatever you are looking at, so a locker or a bed off to one side can be used without canceling free look first.
 - A latched free look is released whenever the game takes control: opening your inventory, the map or the pause menu, sleeping, or any scripted sequence.
 
 ## Using a controller
