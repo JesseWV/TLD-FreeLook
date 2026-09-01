@@ -84,12 +84,12 @@ internal sealed class Settings : JsonModSettings
     [Name("Icon up")]
     [Description("Distance from the chosen corner, bottom to top. Negative moves down, positive up.")]
     [Slider(-360f, 360f, 121, NumberFormat = "{0:0}")]
-    public float IndicatorOffsetY = 48f;
+    public float IndicatorOffsetY = 54f;
 
     [Name("Icon size")]
     [Description("Height of the icon on a 720 tall interface, so it scales with the game's own interface rather than with your resolution.")]
     [Slider(16f, 96f, 81, NumberFormat = "{0:0}")]
-    public float IndicatorSize = 60f;
+    public float IndicatorSize = 50f;
 
     [Name("Icon opacity")]
     [Description("How strongly the icon is drawn. The interface house style is restrained, so full strength shouts.")]

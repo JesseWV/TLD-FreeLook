@@ -31,9 +31,9 @@ internal static class Config
     internal static IndicatorCorner IndicatorAnchor = IndicatorCorner.BottomRight;
 
     internal static float IndicatorOffsetX = -40f;
-    internal static float IndicatorOffsetY = 48f;
+    internal static float IndicatorOffsetY = 54f;
 
-    internal static int IndicatorSize = 60;
+    internal static int IndicatorSize = 50;
 
     internal static float IndicatorOpacity = 1f;
 
