@@ -6,7 +6,7 @@ Look around while you walk. Hold **Left Alt** and the camera swings away from th
 
 - The Long Dark (built against 2.55)
 - [MelonLoader](https://melonwiki.xyz/)
-- [ModSettings](https://github.com/DigitalzombieTLD/ModSettings) - optional. Without it the mod still works on its defaults; with it you get an in-game settings page.
+- [ModSettings](https://github.com/DigitalzombieTLD/ModSettings) - for the in-game settings page.
 
 ## Installation
 
