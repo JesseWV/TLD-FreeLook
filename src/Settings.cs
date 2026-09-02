@@ -43,10 +43,10 @@ internal sealed class Settings : JsonModSettings
     [Slider(15f, 180f, 166, NumberFormat = "{0:0}°")]
     public float YawLimit = 155f;
 
-    [Name("Return time")]
-    [Description("How long the view takes to swing back to the direction of travel after you release the key. Zero snaps back instantly.")]
-    [Slider(0f, 300f, 7, NumberFormat = "{0:0} ms")]
-    public float ReturnMilliseconds = 150f;
+    [Name("Return speed")]
+    [Description("How fast the view swings back to the direction of travel after you release the key, in degrees per second. A quick glance comes back promptly and a full swing takes proportionally longer, the way a head turning back does. Zero snaps instantly.")]
+    [Slider(0f, 1200f, 41, NumberFormat = "{0:0}°/s")]
+    public float ReturnSpeed = 300f;
 
     [Name("Turn to face your aim")]
     [Description("Raising a weapon while looking around turns you to face where you were looking, instead of swinging your view back to where you were walking. Off means the view snaps back and you aim where your body was pointing.")]
@@ -125,7 +125,7 @@ internal sealed class Settings : JsonModSettings
         Config.ToggleMode = ToggleMode;
         Config.DoubleTapLatch = DoubleTapLatch;
         Config.YawLimit = Mathf.Round(YawLimit);
-        Config.ReturnSeconds = Mathf.Round(ReturnMilliseconds) / 1000f;
+        Config.ReturnSpeed = Mathf.Round(ReturnSpeed);
         Config.DisableWhileAiming = DisableWhileAiming;
         Config.TurnToAim = TurnToAim;
         Config.ShowHeldItem = ShowHeldItem;

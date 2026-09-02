@@ -21,15 +21,17 @@ internal static class FreeLookController
 
     private static float _yawOffset;
 
-    private static float _returnVelocity;
-
     private static bool _wasEngaged;
 
     private static float _entryPitch;
 
-    private static bool _pitchReturning;
+    private static bool _returning;
+    private static float _returnElapsed;
+    private static float _returnDuration;
+    private static float _returnYaw0;
+    private static float _returnPitch0;
 
-    private static float _pitchVelocity;
+    private static float _lastYaw;
 
     internal static void Reset()
     {
@@ -40,12 +42,15 @@ internal static class FreeLookController
         _revealHoldUntil = 0f;
         _lastTapTime = -1f;
         _yawOffset = 0f;
-        _returnVelocity = 0f;
         _wasEngaged = false;
         _indicatorEngaged = false;
         _indicatorLatched = false;
-        _pitchReturning = false;
-        _pitchVelocity = 0f;
+        _returning = false;
+        _returnElapsed = 0f;
+        _returnDuration = 0f;
+        _returnYaw0 = 0f;
+        _returnPitch0 = 0f;
+        _lastYaw = float.NaN;
     }
 
     internal static void PollInput()
@@ -178,34 +183,9 @@ internal static class FreeLookController
             if (Config.Verbose) Core.Log.Msg("weapon raised - latched free look released");
         }
 
-        if (engaged)
-        {
-
-            _returnVelocity = 0f;
-        }
-        else if (_yawOffset != 0f)
-        {
-            if (Config.ReturnSeconds <= 0f)
-            {
-                _yawOffset = 0f;
-                _returnVelocity = 0f;
-            }
-            else
-            {
-
-                _yawOffset = Mathf.SmoothDamp(_yawOffset, 0f, ref _returnVelocity,
-                                              Config.ReturnSeconds, Mathf.Infinity, Time.unscaledDeltaTime);
-                if (Mathf.Abs(_yawOffset) < 0.01f)
-                {
-                    _yawOffset = 0f;
-                    _returnVelocity = 0f;
-                }
-            }
-        }
+        UpdateReturn(camera, engaged);
 
         UpdateArms(camera, engaged);
-
-        UpdateVerticalReturn(camera, engaged);
 
         if (Config.Verbose && engaged != _wasEngaged)
             Core.Log.Msg($"free look {(engaged ? "engaged" : "released")} (offset {_yawOffset:0.0} deg)");
@@ -227,7 +207,7 @@ internal static class FreeLookController
         if (_haveWritten && t.rotation == _lastWritten)
         {
             _yawOffset = 0f;
-            _returnVelocity = 0f;
+            _returning = false;
             _haveWritten = false;
             return;
         }
@@ -270,7 +250,7 @@ internal static class FreeLookController
         return pm == null || pm.m_ItemInHands == null;
     }
 
-    private static void UpdateVerticalReturn(vp_FPSCamera camera, bool engaged)
+    private static void UpdateReturn(vp_FPSCamera camera, bool engaged)
     {
         if (engaged)
         {
@@ -278,36 +258,90 @@ internal static class FreeLookController
             if (!_wasEngaged)
             {
                 _entryPitch = camera.m_Pitch;
-                _pitchVelocity = 0f;
             }
 
-            _pitchReturning = false;
+            _returning = false;
+            _lastYaw = camera.m_Yaw;
             return;
         }
 
-        if (_wasEngaged) _pitchReturning = true;
-
-        if (!_pitchReturning) return;
-
-        if (Config.ReturnSeconds <= 0f)
+        if (_wasEngaged)
         {
+            BeginReturn(camera);
+
+            if (_returning) ApplyPitch(camera, _returnPitch0);
+            _lastYaw = camera.m_Yaw;
+            return;
+        }
+
+        if (!_returning) { _lastYaw = camera.m_Yaw; return; }
+
+        bool pitchInput = Mathf.Abs(camera.m_TargetPitch - camera.m_Pitch) > InputEpsilon;
+        bool yawInput = !float.IsNaN(_lastYaw) && Mathf.Abs(Mathf.DeltaAngle(_lastYaw, camera.m_Yaw)) > InputEpsilon;
+        if (pitchInput || yawInput)
+        {
+            CommitReturnToBody(camera);
+            _lastYaw = camera.m_Yaw;
+            return;
+        }
+
+        _returnElapsed += Time.unscaledDeltaTime;
+
+        float u = _returnDuration > 0f ? Mathf.Clamp01(_returnElapsed / _returnDuration) : 1f;
+        float eased = u * u * (3f - 2f * u);
+
+        _yawOffset = Mathf.Lerp(_returnYaw0, 0f, eased);
+        ApplyPitch(camera, Mathf.Lerp(_returnPitch0, _entryPitch, eased));
+
+        if (u >= 1f)
+        {
+            _yawOffset = 0f;
             ApplyPitch(camera, _entryPitch);
-            _pitchReturning = false;
-            _pitchVelocity = 0f;
+            _returning = false;
+        }
+
+        _lastYaw = camera.m_Yaw;
+    }
+
+    private const float InputEpsilon = 0.01f;
+
+    private static void BeginReturn(vp_FPSCamera camera)
+    {
+        _returnYaw0 = _yawOffset;
+        _returnPitch0 = camera.m_Pitch;
+        _returnElapsed = 0f;
+
+        float dPitch = _returnPitch0 - _entryPitch;
+        float distance = Mathf.Sqrt(_returnYaw0 * _returnYaw0 + dPitch * dPitch);
+
+        if (distance <= 0f) { _returning = false; return; }
+
+        if (Config.ReturnSpeed <= 0f)
+        {
+            _yawOffset = 0f;
+            ApplyPitch(camera, _entryPitch);
+            _returning = false;
             return;
         }
 
-        float pitch = Mathf.SmoothDamp(camera.m_Pitch, _entryPitch, ref _pitchVelocity,
-                                       Config.ReturnSeconds, Mathf.Infinity, Time.unscaledDeltaTime);
+        _returnDuration = distance / Config.ReturnSpeed;
+        _returning = true;
+    }
 
-        if (Mathf.Abs(pitch - _entryPitch) < 0.05f)
-        {
-            pitch = _entryPitch;
-            _pitchReturning = false;
-            _pitchVelocity = 0f;
-        }
+    private static void CommitReturnToBody(vp_FPSCamera camera)
+    {
+        _returning = false;
 
-        ApplyPitch(camera, pitch);
+        float committed = _yawOffset;
+        if (committed == 0f) return;
+
+        camera.m_Yaw += committed;
+        camera.m_TargetYaw += committed;
+        camera.m_CurrentYaw += committed;
+        _yawOffset = 0f;
+
+        Transform t = camera.transform;
+        if (t != null) t.rotation = Quaternion.AngleAxis(committed, Vector3.up) * t.rotation;
     }
 
     private static void ApplyPitch(vp_FPSCamera camera, float pitch)
@@ -333,7 +367,7 @@ internal static class FreeLookController
         camera.m_CurrentYaw += committed;
 
         _yawOffset = 0f;
-        _returnVelocity = 0f;
+        _returning = false;
         _entryPitch = camera.m_Pitch;
 
         Transform t = camera.transform;
