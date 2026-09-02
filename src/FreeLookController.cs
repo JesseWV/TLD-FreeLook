@@ -319,7 +319,9 @@ internal static class FreeLookController
 
     private static void BeginReturn(vp_FPSCamera camera)
     {
-        _returnYaw0 = _yawOffset;
+
+        _returnYaw0 = Mathf.DeltaAngle(0f, _yawOffset);
+        _yawOffset = _returnYaw0;
         _returnPitch0 = camera.m_Pitch;
         _returnElapsed = 0f;
         _opposedAccum = 0f;
