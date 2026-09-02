@@ -33,6 +33,8 @@ internal static class FreeLookController
 
     private static float _lastYaw;
 
+    private static float _opposedAccum;
+
     internal static void Reset()
     {
         ShowArms();
@@ -51,6 +53,7 @@ internal static class FreeLookController
         _returnYaw0 = 0f;
         _returnPitch0 = 0f;
         _lastYaw = float.NaN;
+        _opposedAccum = 0f;
     }
 
     internal static void PollInput()
@@ -276,9 +279,18 @@ internal static class FreeLookController
 
         if (!_returning) { _lastYaw = camera.m_Yaw; return; }
 
-        bool pitchInput = Mathf.Abs(camera.m_TargetPitch - camera.m_Pitch) > InputEpsilon;
-        bool yawInput = !float.IsNaN(_lastYaw) && Mathf.Abs(Mathf.DeltaAngle(_lastYaw, camera.m_Yaw)) > InputEpsilon;
-        if (pitchInput || yawInput)
+        float errYaw = _yawOffset;
+        float errPitch = camera.m_Pitch - _entryPitch;
+        float errMag = Mathf.Sqrt(errYaw * errYaw + errPitch * errPitch);
+        if (errMag > 0.0001f)
+        {
+            float inYaw = float.IsNaN(_lastYaw) ? 0f : Mathf.DeltaAngle(_lastYaw, camera.m_Yaw);
+            float inPitch = camera.m_TargetPitch - camera.m_Pitch;
+            float opposed = (inYaw * errYaw + inPitch * errPitch) / errMag;
+            if (opposed > 0f) _opposedAccum += opposed;
+        }
+
+        if (_opposedAccum > TakeoverDeadzone)
         {
             CommitReturnToBody(camera);
             _lastYaw = camera.m_Yaw;
@@ -303,13 +315,14 @@ internal static class FreeLookController
         _lastYaw = camera.m_Yaw;
     }
 
-    private const float InputEpsilon = 0.01f;
+    private const float TakeoverDeadzone = 3f;
 
     private static void BeginReturn(vp_FPSCamera camera)
     {
         _returnYaw0 = _yawOffset;
         _returnPitch0 = camera.m_Pitch;
         _returnElapsed = 0f;
+        _opposedAccum = 0f;
 
         float dPitch = _returnPitch0 - _entryPitch;
         float distance = Mathf.Sqrt(_returnYaw0 * _returnYaw0 + dPitch * dPitch);
