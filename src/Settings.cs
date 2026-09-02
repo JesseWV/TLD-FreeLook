@@ -44,7 +44,7 @@ internal sealed class Settings : JsonModSettings
     public float YawLimit = 155f;
 
     [Name("Return speed")]
-    [Description("How fast the view swings back to the direction of travel after you release the key, in degrees per second. A quick glance comes back promptly and a full swing takes proportionally longer, the way a head turning back does. Zero snaps instantly.")]
+    [Description("How fast the view swings back to the direction of travel after you release the key, in degrees per second. A quick glance comes back promptly and a full swing takes proportionally longer, the way a head turning back does. Zero snaps back instantly.\n\nFor a sense of scale, looking around at a relaxed pace runs somewhere around 150°/s, and the fastest a person can swing their gaze is roughly 800°/s. Past that the view is moving quicker than you could actually look.")]
     [Slider(0f, 1200f, 41, NumberFormat = "{0:0}°/s")]
     public float ReturnSpeed = 600f;
 

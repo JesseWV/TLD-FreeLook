@@ -23,7 +23,7 @@ Configurable in-game under **Mod Settings → Free Look**:
 | Toggle instead of hold             | Off      | Tap to enter free look and tap again to leave, rather than holding.                                                   |
 | Double tap to latch                | Off      | Holding still works, but a quick double tap latches free look on, and another releases it.                            |
 | Look range                         | 155°     | How far the view may swing from your direction of travel, to each side.                                               |
-| Return speed                       | 600°/s | How fast the view swings back once released. A quick glance returns promptly, a full swing takes proportionally longer. Zero snaps instantly. |
+| Return speed                       | 600°/s | How fast the view swings back once released. A quick glance returns promptly, a full swing takes proportionally longer. For scale, a relaxed look around is around 150°/s and the human limit is roughly 800°/s. Zero snaps instantly. |
 | Turn to face your aim              | On       | Raising a weapon while looking around turns you to face where you were looking, rather than swinging your view back.  |
 | Disable while aiming               | On       | Suppress free look while a weapon is raised, so your aim is never pointed somewhere you are not looking.              |
 | Show held item while looking       | Off      | Keep whatever is in your hands on screen while looking around. Expect visible cut-off edges - see below.              |
