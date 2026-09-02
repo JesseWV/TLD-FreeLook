@@ -18,7 +18,7 @@ internal static class Config
 
     internal static float YawLimit = 155f;
 
-    internal static float ReturnSpeed = 300f;
+    internal static float ReturnSpeed = 600f;
 
     internal static IndicatorVisibility ShowIcon = IndicatorVisibility.WhenLatched;
 

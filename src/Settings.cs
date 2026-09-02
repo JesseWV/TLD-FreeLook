@@ -46,7 +46,7 @@ internal sealed class Settings : JsonModSettings
     [Name("Return speed")]
     [Description("How fast the view swings back to the direction of travel after you release the key, in degrees per second. A quick glance comes back promptly and a full swing takes proportionally longer, the way a head turning back does. Zero snaps instantly.")]
     [Slider(0f, 1200f, 41, NumberFormat = "{0:0}°/s")]
-    public float ReturnSpeed = 300f;
+    public float ReturnSpeed = 600f;
 
     [Name("Turn to face your aim")]
     [Description("Raising a weapon while looking around turns you to face where you were looking, instead of swinging your view back to where you were walking. Off means the view snaps back and you aim where your body was pointing.")]
