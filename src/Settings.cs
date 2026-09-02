@@ -39,9 +39,9 @@ internal sealed class Settings : JsonModSettings
 
     [Section("Feel")]
     [Name("Look range")]
-    [Description("How far the view may swing from the direction you are walking, to each side. The default of 155 degrees is about as far as you can look while still walking forwards - neck, eyes and a twist from the hips.")]
-    [Slider(15f, 180f, 166, NumberFormat = "{0:0}°")]
-    public float YawLimit = 155f;
+    [Description("How far the view may swing from the direction you are walking, to each side. The default of 180 degrees is looking straight behind you, which between neck, eyes and a twist from the hips is about what a person can manage. The slider goes further for anyone who wants a view the body could not actually deliver.")]
+    [Slider(15f, 270f, 256, NumberFormat = "{0:0}°")]
+    public float YawLimit = 180f;
 
     [Name("Return speed")]
     [Description("How fast the view swings back to the direction of travel after you release the key, in degrees per second. A quick glance comes back promptly and a full swing takes proportionally longer, the way a head turning back does. Zero snaps back instantly.\n\nFor a sense of scale, looking around at a relaxed pace runs somewhere around 150°/s, and the fastest a person can swing their gaze is roughly 800°/s. Past that the view is moving quicker than you could actually look.")]

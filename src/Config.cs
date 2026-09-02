@@ -16,7 +16,7 @@ internal static class Config
 
     internal static bool DoubleTapLatch = false;
 
-    internal static float YawLimit = 155f;
+    internal static float YawLimit = 180f;
 
     internal static float ReturnSpeed = 600f;
 
