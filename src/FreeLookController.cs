@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Il2Cpp;
 using UnityEngine;
 
@@ -56,12 +56,68 @@ internal static class FreeLookController
         _opposedAccum = 0f;
     }
 
+    private static int _gameplayFrame = -1;
+    private static bool _gameplayCached;
+
+    private static bool InGameplay()
+    {
+        if (_gameplayFrame == Time.frameCount) return _gameplayCached;
+
+        _gameplayFrame = Time.frameCount;
+        _gameplayCached = ReadGameplay();
+        return _gameplayCached;
+    }
+
+    private static bool ReadGameplay()
+    {
+
+        string scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        if (string.IsNullOrEmpty(scene)) return false;
+        if (scene.Contains("Boot", StringComparison.OrdinalIgnoreCase)) return false;
+        if (scene.Contains("Empty", StringComparison.OrdinalIgnoreCase)) return false;
+        if (scene.StartsWith("MainMenu", StringComparison.OrdinalIgnoreCase)) return false;
+
+        try
+        {
+
+            if (Il2Cpp.GameManager.m_Instance == null) return false;
+
+            return !Il2Cpp.GameManager.IsMainMenuActive();
+        }
+        catch
+        {
+
+            return false;
+        }
+    }
+
+    private static bool ControlWasTakenAway()
+    {
+        try
+        {
+            return Il2Cpp.GameManager.ControlsLocked()
+                   || Il2Cpp.InterfaceManager.IsOverlayActiveImmediate();
+        }
+        catch
+        {
+            return true;
+        }
+    }
+
     internal static void PollInput()
     {
         if (!Config.EnableMod)
         {
 
             if (_yawOffset != 0f || _latched || _requested || _maskCleared) Reset();
+            return;
+        }
+
+        if (!InGameplay() || !Application.isFocused)
+        {
+            if (_yawOffset != 0f || _latched || _requested || _maskCleared) Reset();
+
+            _wasDown = true;
             return;
         }
 
@@ -85,8 +141,7 @@ internal static class FreeLookController
             return;
         }
 
-        if (_latched && (Il2Cpp.GameManager.ControlsLocked()
-                         || Il2Cpp.InterfaceManager.IsOverlayActiveImmediate()))
+        if (_latched && ControlWasTakenAway())
         {
             _latched = false;
             _lastTapTime = -1f;
@@ -173,6 +228,8 @@ internal static class FreeLookController
     internal static void ApplyToCamera(vp_FPSCamera camera)
     {
         if (camera == null) return;
+
+        if (!InGameplay()) return;
 
         bool engaged = ShouldEngage(camera);
 
