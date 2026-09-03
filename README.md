@@ -16,7 +16,9 @@ Drop `FreeLook.dll` into the game's `Mods` folder.
 
 Configurable in-game under **Mod Settings → Free Look**:
 
-<img src="https://raw.githubusercontent.com/JesseWV/TLDModsListJson/main/FreeLook_Settings.jpg" alt="The Free Look settings page" width="620">
+<img src="https://raw.githubusercontent.com/JesseWV/TLDModsListJson/main/FreeLook_Settings_cr1.jpg" alt="The Free Look settings page: General and Feel" width="620">
+
+<img src="https://raw.githubusercontent.com/JesseWV/TLDModsListJson/main/FreeLook_Settings_cr2.jpg" alt="The Free Look settings page: Arms, Indicator icon and Locks" width="620">
 
 | Setting                            | Default  | What it does                                                                                                          |
 | ---------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------- |
@@ -37,7 +39,7 @@ Configurable in-game under **Mod Settings → Free Look**:
 
 Using any latching setting such as **Toggle instead of hold** or **Double tap to latch**, will cause a small latched indicator icon to appear in the bottom right near the crouching icon area. Its position and size can be adjusted to accommodate other HUD mods.
 
-<img src="https://raw.githubusercontent.com/JesseWV/TLDModsListJson/main/FreeLook_Screenshot.jpg" alt="The indicator icon in the bottom right corner while free look is latched" width="620">
+<img src="https://raw.githubusercontent.com/JesseWV/TLDModsListJson/main/FreeLook_Screenshot_cr.jpg" alt="The indicator icon in the bottom right corner while free look is latched" width="620">
 
 ## Notes
 
