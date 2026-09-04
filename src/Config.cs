@@ -49,5 +49,19 @@ internal static class Config
 
     internal static bool DisableWhileCrouched = false;
 
+    internal static bool EnableFocus = true;
+
+    internal static KeyCode FocusKey = KeyCode.Mouse2;
+
+    internal static bool FocusToggle = false;
+
+    internal static float FocusZoom = 2f;
+
+    internal static float FocusEase = 1f;
+
+    internal static bool FxEdgeDarkening = true;
+
+    internal static bool FxFovealBlur = true;
+
     internal static bool Verbose = false;
 }

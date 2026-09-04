@@ -1,10 +1,9 @@
-using System;
 using System.Linq;
 using System.Reflection;
 using FreeLook;
 using MelonLoader;
 
-[assembly: MelonInfo(typeof(Core), "FreeLook", "1.2.1", "Lycanthor")]
+[assembly: MelonInfo(typeof(Core), "FreeLook", "1.3.0", "Lycanthor")]
 [assembly: MelonGame("Hinterland", "TheLongDark")]
 [assembly: MelonOptionalDependencies("ModSettings")]
 
@@ -18,6 +17,10 @@ public class Core : MelonMod
     public override void OnInitializeMelon()
     {
         Instance = this;
+
+        LoggerInstance.Msg("build " + (Assembly.GetExecutingAssembly()
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+            ?? "unknown"));
 
         bool modSettingsPresent = AppDomain.CurrentDomain.GetAssemblies()
             .Any(a => a.GetName().Name == "ModSettings");

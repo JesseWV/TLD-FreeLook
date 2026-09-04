@@ -56,6 +56,37 @@ internal sealed class Settings : JsonModSettings
     [Description("Suppress free look while a weapon is raised, so your aim is never pointed somewhere you are not looking. Recommended.")]
     public bool DisableWhileAiming = true;
 
+    [Section("Focus View")]
+    [Name("Enable focus view")]
+    [Description("While you are already looking around, hold a second key to zoom in on whatever you turned to see. It only works during free look: the two are meant as halves of one gesture, looking away from where you are walking and then concentrating on what you found.")]
+    public bool EnableFocus = true;
+
+    [Name("Focus key")]
+    [Description("Held down to zoom, while free look is engaged. The default is the middle mouse button, which The Long Dark itself leaves unbound - note that Unity calls that one Mouse2, not Mouse3. Right mouse is deliberately not offered as the default: in this game it aims, throws a torch or a flare, or switches a flashlight to its faster-draining high beam, depending on what you are holding. None = off.")]
+    public KeyCode FocusKey = KeyCode.Mouse2;
+
+    [Name("Toggle focus instead of holding")]
+    [Description("Tap the focus key to zoom in and tap again to come back out, rather than holding it. The zoom still ends the moment free look does, so it can never be left on by accident.")]
+    public bool FocusToggle = false;
+
+    [Name("Zoom Amount")]
+    [Description("How far in the focus view zooms, as a magnification. The game's own zoom when aiming a weapon is about 1.43x, so that is a good reference for what a modest value looks like. Your look sensitivity is reduced by the same factor, so the view does not turn twitchy at the far end.")]
+    [Slider(1f, 4f, 61, NumberFormat = "{0:0.00}x")]
+    public float FocusZoom = 2f;
+
+    [Name("Zoom Time")]
+    [Description("How long the zoom takes to arrive, and to leave again, in seconds.\n\nThis applies whenever you work the focus key yourself. When free look ENDS while you are still zoomed, the zoom ignores this and follows the view's own journey home instead, so the two arrive together rather than one waiting on the other.")]
+    [Slider(0.25f, 2f, 36, NumberFormat = "{0:0.00}s")]
+    public float FocusEase = 1f;
+
+    [Name("Edge darkening")]
+    [Description("Darkens the edges of the screen while you are focused, so concentrating reads on screen and not only in how much you can see. It is the game's own edge darkening turned up slightly, so the shape is the one you are already used to, and it fades in and out with the zoom.")]
+    public bool FxEdgeDarkening = true;
+
+    [Name("Foveal blur")]
+    [Description("Sharp in the middle of the screen, blurring gently toward the edges, the way your own vision works. Built from the game's own bokeh blur driven by screen position rather than by distance. The middle is always the sharp part, and how much of the screen blurs is fixed rather than adjustable.")]
+    public bool FxFovealBlur = true;
+
     [Section("Arms")]
     [Name("Show held item while looking")]
     [Description("Keeps your held item on screen while you look around. It will look wrong: these models are only built for a forward view, so expect hollow cut edges, geometry ending in mid-air, and the camera passing inside the mesh. The angles below hide it before that point.")]
@@ -132,6 +163,15 @@ internal sealed class Settings : JsonModSettings
         Config.HideBeyond = Mathf.Round(HideBeyond);
         Config.DisableWhenEquipped = DisableWhenEquipped;
         Config.DisableWhileCrouched = DisableWhileCrouched;
+        Config.EnableFocus = EnableFocus;
+        Config.FocusKey = FocusKey;
+        Config.FocusToggle = FocusToggle;
+        Config.FocusZoom = Round2(Mathf.Clamp(FocusZoom, 1f, 4f));
+
+        Config.FocusEase = Round2(Mathf.Clamp(FocusEase, 0.25f, 2f));
+        Config.FxEdgeDarkening = FxEdgeDarkening;
+        Config.FxFovealBlur = FxFovealBlur;
+
         Config.ShowIcon = ShowIcon;
         Config.IconOverlayScale = IconOverlayScale;
         Config.ScreenAnchor = ScreenAnchor;
@@ -141,6 +181,8 @@ internal sealed class Settings : JsonModSettings
         Config.IconOpacity = IconOpacity;
         Config.Verbose = Verbose;
     }
+
+    private static float Round2(float v) => Mathf.Round(v * 100f) / 100f;
 
     internal void ApplyVisibility()
     {
@@ -161,6 +203,14 @@ internal sealed class Settings : JsonModSettings
         SetFieldVisible(nameof(DoubleTapLatch), !ToggleMode);
 
         SetFieldVisible(nameof(TurnToAim), DisableWhileAiming);
+
+        SetFieldVisible(nameof(FocusKey), EnableFocus);
+        SetFieldVisible(nameof(FocusToggle), EnableFocus);
+        SetFieldVisible(nameof(FocusZoom), EnableFocus);
+        SetFieldVisible(nameof(FocusEase), EnableFocus);
+        SetFieldVisible(nameof(FxEdgeDarkening), EnableFocus);
+        SetFieldVisible(nameof(FxFovealBlur), EnableFocus);
+
         RefreshGUI();
     }
 

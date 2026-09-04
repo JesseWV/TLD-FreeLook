@@ -7,11 +7,13 @@
     <RootNamespace>FreeLook</RootNamespace>
     <AssemblyName>FreeLook</AssemblyName>
     <LangVersion>latest</LangVersion>
-    <AssemblyVersion>1.2.1.0</AssemblyVersion>
-    <FileVersion>1.2.1.0</FileVersion>
+    <AssemblyVersion>1.3.0.0</AssemblyVersion>
+    <FileVersion>1.3.0.0</FileVersion>
     <DebugType>none</DebugType>
   </PropertyGroup>
 
+  <!-- Il2Cpp reference assemblies + ModSettings via NuGet, so the project builds without a local
+       game install. Same pins as the other 2.55-era mods in this workspace. -->
   <ItemGroup>
     <PackageReference Include="Waltz.Modding.TLD.Il2CppAssemblies.Windows" Version="2.52.0" />
     <PackageReference Include="STBlade.Modding.TLD.ModSettings" Version="1.9.0" />
