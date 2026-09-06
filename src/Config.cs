@@ -59,6 +59,18 @@ internal static class Config
 
     internal static float FocusEase = 1f;
 
+    internal static bool FocusStandalone = false;
+
+    internal static bool StandaloneGuardAiming = true;
+
+    internal static bool StandaloneGuardControlMode = true;
+
+    internal static bool StandaloneGuardDetached = true;
+
+    internal static bool StandaloneGuardCrouched = false;
+
+    internal static bool StandaloneGuardEquipped = false;
+
     internal static bool FxEdgeDarkening = true;
 
     internal static bool FxFovealBlur = true;

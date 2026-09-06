@@ -40,6 +40,8 @@ internal static class FreeLookController
 
     private static float _focusFactor;
 
+    private static bool _focusRodeLook;
+
     internal static void Reset()
     {
         ShowArms();
@@ -49,7 +51,11 @@ internal static class FreeLookController
         _focusLatched = false;
         _focusWasDown = false;
         _focusFactor = 0f;
+        _focusRodeLook = false;
+        _standaloneOk = false;
+        _aiming = false;
         _weaponCam = null;
+        _weapon = null;
         _requested = false;
         _latched = false;
         _revealHoldUntil = 0f;
@@ -68,7 +74,8 @@ internal static class FreeLookController
     }
 
     private static bool NeedsReset() =>
-        _yawOffset != 0f || _latched || _requested || _maskCleared || _focusFactor != 0f || _haveFov;
+        _yawOffset != 0f || _latched || _requested || _maskCleared || _focusFactor != 0f ||
+        _haveFov || _haveWeaponFov;
 
     private static int _gameplayFrame = -1;
     private static bool _gameplayCached;
@@ -242,6 +249,62 @@ internal static class FreeLookController
 
     internal static bool LookLatchedLive => _indicatorLatched && LookStateFresh;
 
+    private static bool _standaloneOk;
+
+    private static bool _aiming;
+
+    private static bool AimingLive => _aiming && LookStateFresh;
+
+    private const float AimHandoff = 0.5f;
+
+    private static bool StandaloneAllowedLive => _standaloneOk && LookStateFresh;
+
+    private static bool _sgFreeCam, _sgAiming, _sgOverlay, _sgControlMode, _sgDetached, _sgCrouched, _sgEquipped;
+
+    private static bool StandaloneFocusAllowed(vp_FPSCamera camera)
+    {
+        if (!Config.EnableMod || !Config.EnableFocus || camera == null) return false;
+
+        _sgFreeCam = camera.IsFreeCameraLookEnabled();
+
+        bool overlay;
+        try
+        {
+            overlay = Il2Cpp.GameManager.ControlsLocked() || Il2Cpp.InterfaceManager.IsOverlayActiveImmediate();
+        }
+        catch
+        {
+            overlay = true;
+        }
+        _sgOverlay = overlay;
+
+        _sgAiming = camera.IsZoomed || AimControlModeActive();
+
+        _sgControlMode = !ControlModeAllowsFreeLook();
+        _sgDetached = CameraDetachedFromBody(camera);
+        _sgCrouched = IsCrouching();
+        _sgEquipped = !NothingEquipped();
+
+        if (_sgFreeCam || _sgOverlay) return false;
+        if (Config.StandaloneGuardAiming && _sgAiming) return false;
+        if (Config.StandaloneGuardControlMode && _sgControlMode) return false;
+        if (Config.StandaloneGuardDetached && _sgDetached) return false;
+        if (Config.StandaloneGuardCrouched && _sgCrouched) return false;
+        if (Config.StandaloneGuardEquipped && _sgEquipped) return false;
+
+        return true;
+    }
+
+    private static bool AimControlModeActive()
+    {
+        var pm = Il2Cpp.GameManager.GetPlayerManagerComponent();
+        return pm != null && IsAimControlMode(pm.GetControlMode());
+    }
+
+    private static string StandaloneGuardTrace() =>
+        $"freeCam={_sgFreeCam} aiming={_sgAiming} overlay={_sgOverlay} " +
+        $"controlMode={_sgControlMode} detached={_sgDetached} crouched={_sgCrouched} equipped={_sgEquipped}";
+
     private static bool ShouldEngage(vp_FPSCamera camera)
     {
         if (!Config.EnableMod || !_requested || camera == null) return false;
@@ -263,7 +326,6 @@ internal static class FreeLookController
 
     internal static void DivertYaw(vp_FPSCamera camera, ref Vector2 input)
     {
-        if (!ShouldEngage(camera)) return;
 
         float scale = FocusInputScale();
         if (scale != 1f)
@@ -271,6 +333,8 @@ internal static class FreeLookController
             input.x *= scale;
             input.y *= scale;
         }
+
+        if (!ShouldEngage(camera)) return;
 
         float limit = Mathf.Max(0f, Config.YawLimit);
         _yawOffset = Mathf.Clamp(_yawOffset + input.x, -limit, limit);
@@ -309,6 +373,10 @@ internal static class FreeLookController
         _indicatorEngaged = engaged;
         _indicatorLatched = engaged && _latched;
         _indicatorStamp = Time.unscaledTime;
+
+        _aiming = camera.IsZoomed;
+
+        _standaloneOk = (Config.FocusStandalone || Config.Verbose) && StandaloneFocusAllowed(camera);
 
         if (_yawOffset == 0f)
         {
@@ -397,6 +465,13 @@ internal static class FreeLookController
     private static float _fovWritten;
     private static bool _haveFov;
 
+    private static Camera _weaponFovCam;
+    private static float _weaponFovSource;
+    private static float _weaponFovWritten;
+    private static bool _haveWeaponFov;
+
+    private static vp_FPSWeapon _weapon;
+
     private static bool _wasFocused;
 
     private static float FocusEased => _focusFactor * _focusFactor * (3f - 2f * _focusFactor);
@@ -423,22 +498,33 @@ internal static class FreeLookController
     private static void UpdateFocus()
     {
         bool engaged = LookEngagedLive;
+        bool standalone = Config.FocusStandalone && !engaged && StandaloneAllowedLive;
+        bool allowed = engaged || standalone;
 
-        if (!engaged) _focusLatched = false;
+        if (!allowed) _focusLatched = false;
 
-        bool focus = engaged && Config.EnableFocus && _focusRequested;
+        bool focus = allowed && Config.EnableFocus && _focusRequested;
 
-        if (Config.Verbose && focus != _wasFocused) Core.Log.Msg($"focus {(focus ? "engaged" : "released")}");
+        if (focus && engaged) _focusRodeLook = true;
+        else if (!focus && _focusFactor <= 0f) _focusRodeLook = false;
+
+        if (Config.Verbose && focus != _wasFocused)
+            Core.Log.Msg($"focus {(focus ? (engaged ? "engaged (free look)" : "engaged (standalone)") : "released")} - {StandaloneGuardTrace()}");
         _wasFocused = focus;
 
         float dt = Time.unscaledDeltaTime;
 
-        if (!engaged && Config.ReturnSpeed <= 0f)
+        if (AimingLive && Config.DisableWhileAiming)
+        {
+
+            _focusFactor = Mathf.MoveTowards(_focusFactor, 0f, dt / AimHandoff);
+        }
+        else if (_focusRodeLook && !engaged && Config.ReturnSpeed <= 0f)
         {
 
             _focusFactor = 0f;
         }
-        else if (!focus && _returning && _returnDuration > _returnElapsed)
+        else if (_focusRodeLook && !focus && _returning && _returnDuration > _returnElapsed)
         {
 
             float remaining = _returnDuration - _returnElapsed;
@@ -459,29 +545,83 @@ internal static class FreeLookController
 
     private static void ApplyZoom(vp_FPSCamera camera)
     {
-        Camera cam = camera.m_Camera;
-        if (cam == null) return;
-
-        if (!ReferenceEquals(cam, _fovCam)) { _fovCam = cam; _haveFov = false; }
-
-        float current = cam.fieldOfView;
-        if (!_haveFov || current != _fovWritten) _fovBase = current;
-
         float mag = Mathf.Max(1f, Config.FocusZoom);
-        float target = _fovBase * Mathf.Lerp(1f, 1f / mag, FocusEased);
+        float scale = Mathf.Lerp(1f, 1f / mag, FocusEased);
 
-        cam.fieldOfView = target;
-        _fovWritten = target;
-        _haveFov = true;
+        Camera cam = camera.m_Camera;
+        if (cam != null)
+        {
+
+            if (!ReferenceEquals(cam, _fovCam)) { _fovCam = cam; _haveFov = false; }
+
+            float current = cam.fieldOfView;
+            if (!_haveFov || current != _fovWritten) _fovBase = current;
+
+            float target = _fovBase * scale;
+
+            cam.fieldOfView = target;
+            _fovWritten = target;
+            _haveFov = true;
+        }
+
+        ApplyWeaponZoom(camera, scale);
+    }
+
+    private static void ApplyWeaponZoom(vp_FPSCamera camera, float scale)
+    {
+
+        if (camera.IsZoomed) { RestoreWeaponFieldOfView(); return; }
+
+        Camera wc = ResolveWeaponCamera(camera);
+        if (wc == null) return;
+
+        vp_FPSWeapon weapon = ResolveWeapon(wc);
+        float source = weapon != null ? weapon.RenderingFieldOfViewVertical : 0f;
+
+        if (source <= 0f) source = _weaponFovSource;
+
+        if (source <= 0f) { RestoreWeaponFieldOfView(); return; }
+
+        float target = source * scale;
+
+        wc.fieldOfView = target;
+        _weaponFovCam = wc;
+        _weaponFovSource = source;
+        _weaponFovWritten = target;
+        _haveWeaponFov = true;
+    }
+
+    private static vp_FPSWeapon ResolveWeapon(Camera weaponCam)
+    {
+        if (_weapon != null && _weapon.gameObject != null && _weapon.gameObject.activeInHierarchy)
+            return _weapon;
+
+        Transform view = weaponCam != null ? weaponCam.transform.parent : null;
+        _weapon = view != null ? view.GetComponentInChildren<vp_FPSWeapon>() : null;
+        return _weapon;
     }
 
     private static void RestoreFieldOfView()
     {
-        if (!_haveFov) return;
-        _haveFov = false;
+        if (_haveFov)
+        {
+            _haveFov = false;
 
-        if (_fovCam != null && _fovCam.fieldOfView == _fovWritten) _fovCam.fieldOfView = _fovBase;
-        _fovCam = null;
+            if (_fovCam != null && _fovCam.fieldOfView == _fovWritten) _fovCam.fieldOfView = _fovBase;
+            _fovCam = null;
+        }
+
+        RestoreWeaponFieldOfView();
+    }
+
+    private static void RestoreWeaponFieldOfView()
+    {
+        if (!_haveWeaponFov) return;
+        _haveWeaponFov = false;
+
+        if (_weaponFovCam != null && _weaponFovCam.fieldOfView == _weaponFovWritten)
+            _weaponFovCam.fieldOfView = _weaponFovSource;
+        _weaponFovCam = null;
     }
 
     private static void UpdateReturn(vp_FPSCamera camera, bool engaged)

@@ -8,7 +8,7 @@
   
   <img src="screenshots/Icon.png" alt="The latched free look indicator icon" width="80">
 
-- **Focus View** -  While you are looking around, you can focus on things by holding or toggling the **Focus Key**, *default: MiddleMouse*. This only works while FreeLook is engaged.
+- **Focus View** -  Zoom in on what you are looking at by holding or toggling the **Focus Key**, *default: MiddleMouse*. By default it works while FreeLook is engaged but can be used on it's own by enabling **Focus without free look**. 
 
 #### <u>Notes</u>
 
@@ -26,7 +26,7 @@
 
 Everything is configurable in-game under **Mod Settings → Free Look** - the key, hold versus toggle, how far the view may swing, how fast it returns, the zoom, and which focus effects are on. The defaults are the intended experience and nothing needs changing to use the mod.
 
-**[Full settings reference, with screenshots →](SETTINGS.md)**
+**[Full settings reference, every setting and what it does →](SETTINGS.md)**
 
 #### <u>Requirements</u>
 
@@ -37,8 +37,6 @@ Everything is configurable in-game under **Mod Settings → Free Look** - the ke
 #### <u>Installation</u>
 
 Drop `FreeLook.dll` into the game's `Mods` folder.
-
-
 
 #### <u>Credits</u>
 
