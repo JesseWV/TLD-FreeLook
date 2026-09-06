@@ -8,7 +8,9 @@
   
   <img src="screenshots/Icon.png" alt="The latched free look indicator icon" width="80">
 
-- **Focus View** -  Zoom in on what you are looking at by holding or toggling the **Focus Key**, *default: MiddleMouse*. By default it works while FreeLook is engaged but can be used on it's own by enabling **Focus without free look**. 
+- **Focus View** -  Zoom in on what you are looking at by holding or toggling the **Focus Key**, *default: MiddleMouse*. By default it works while FreeLook is engaged but can be used on its own by enabling **Focus without free look**. 
+
+- **Recall** - Tap the **Recall Key**, *default: X*, to swing back to wherever you were last looking. It remembers the direction rather than the angle, so it still finds the spot even after you walked in a different direction. Works while free look is engaged, or on its own: a tap takes you there and opens free look, and either the recall key or your free look key ends it. Forgotten when you change region.
 
 #### <u>Notes</u>
 
@@ -20,7 +22,7 @@
 
 - Turn on **Double tap to latch**, then use the game's own auto-walk control double-tapped to trigger free look.  
 
-- Not sure how to handle **Focus View** on a controller yet. More to come.
+- Not sure how to handle **Focus View** or **Recall** on a controller yet. Options are limited so I'm open to suggestions.
 
 #### <u>Settings</u>
 

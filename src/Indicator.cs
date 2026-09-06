@@ -70,7 +70,7 @@ internal static class Indicator
         catch (System.Exception ex)
         {
 
-            if (Config.Verbose) Core.Log.Warning("indicator refresh failed, disabling it: " + ex.Message);
+            Core.Log.Warning("indicator refresh failed, disabling the icon for this session: " + ex);
             Config.ShowIcon = IndicatorVisibility.Never;
         }
     }

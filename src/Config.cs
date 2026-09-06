@@ -12,6 +12,8 @@ internal static class Config
 
     internal static KeyCode ModifierKey = KeyCode.LeftAlt;
 
+    internal static KeyCode RecallKey = KeyCode.X;
+
     internal static bool ToggleMode = false;
 
     internal static bool DoubleTapLatch = false;

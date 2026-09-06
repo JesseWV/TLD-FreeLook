@@ -37,6 +37,10 @@ internal sealed class Settings : JsonModSettings
     [Description("Holding still works, but a quick double tap latches free look on and another releases it. It is also the only way in on a controller, where the game's auto-walk button - left stick click - latches it too.")]
     public bool DoubleTapLatch = false;
 
+    [Name("Recall key")]
+    [Description("Tapped to swing the view back to where you were last looking. It remembers the DIRECTION, not the angle, so it still finds the same place after you have turned - as far as Look range allows. Works while looking around, and on its own: a tap engages free look and goes there. Tapping it again ends it, and so does the free look key. Forgotten when you change region. None = off.")]
+    public KeyCode RecallKey = KeyCode.X;
+
     [Section("Feel")]
     [Name("Look range")]
     [Description("How far the view may swing from your direction of travel, to each side. 180 is straight behind you, about what neck, eyes and a twist from the hips can manage. The slider goes further for a view the body could not deliver.")]
@@ -158,6 +162,7 @@ internal sealed class Settings : JsonModSettings
         Config.EnableMod = EnableMod;
         Config.ModifierKey = ModifierKey;
         Config.ToggleMode = ToggleMode;
+        Config.RecallKey = RecallKey;
         Config.DoubleTapLatch = DoubleTapLatch;
         Config.YawLimit = Mathf.Round(YawLimit);
         Config.ReturnSpeed = Mathf.Round(ReturnSpeed);

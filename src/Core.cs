@@ -3,7 +3,7 @@ using System.Reflection;
 using FreeLook;
 using MelonLoader;
 
-[assembly: MelonInfo(typeof(Core), "FreeLook", "1.4.0", "Lycanthor")]
+[assembly: MelonInfo(typeof(Core), "FreeLook", "1.5.0", "Lycanthor")]
 [assembly: MelonGame("Hinterland", "TheLongDark")]
 [assembly: MelonOptionalDependencies("ModSettings")]
 
@@ -44,29 +44,51 @@ public class Core : MelonMod
                                "Hold Left Alt to look around. Install ModSettings to rebind it.");
         }
 
-        WarnIfMissing("UpdateMouseLook");
-        WarnIfMissing("DoLateUpdate");
     }
 
-    private static void WarnIfMissing(string method)
+    public override void OnLateInitializeMelon()
+    {
+        ReportPatch(typeof(Il2Cpp.vp_FPSCamera), "UpdateMouseLook");
+        ReportPatch(typeof(Il2Cpp.vp_FPSCamera), "DoLateUpdate");
+        ReportPatch(typeof(Il2Cpp.Panel_HUD), "Update");
+    }
+
+    private void ReportPatch(Type type, string method)
     {
 
-        bool found = typeof(Il2Cpp.vp_FPSCamera)
-            .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-            .Any(m => m.Name == method);
+        var target = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .FirstOrDefault(m => m.Name == method);
 
-        if (!found)
-            Log.Error($"vp_FPSCamera.{method} not found - free look is NOT active. " +
-                      "The game version is probably newer than this mod supports.");
+        if (target == null)
+        {
+            LoggerInstance.Error($"{type.Name}.{method} not found - that part of the mod is NOT " +
+                                 "active. The game version is probably newer than this mod supports.");
+            return;
+        }
+
+        var info = HarmonyLib.Harmony.GetPatchInfo(target);
+        bool ours = info != null &&
+                    info.Prefixes.Concat(info.Postfixes).Any(p => p.owner == HarmonyInstance.Id);
+
+        if (!ours)
+            LoggerInstance.Error($"{type.Name}.{method} exists but carries no patch of ours - " +
+                                 "that part of the mod is NOT active.");
         else if (Config.Verbose)
-            Log.Msg($"patched vp_FPSCamera.{method}");
+            LoggerInstance.Msg($"patched {type.Name}.{method}");
     }
 
-    public override void OnUpdate() => FreeLookController.PollInput();
+    public override void OnUpdate()
+    {
+        if (PatchGuard.Faulted) return;
+        try { FreeLookController.PollInput(); }
+        catch (Exception ex) { PatchGuard.Failed("OnUpdate poll", ex); }
+    }
 
     public override void OnSceneWasUnloaded(int buildIndex, string sceneName)
     {
         FreeLookController.Reset();
+        FreeLookController.ForgetMark();
+        PatchGuard.Clear();
 
         Indicator.Reset();
     }

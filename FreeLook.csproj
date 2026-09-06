@@ -7,8 +7,13 @@
     <RootNamespace>FreeLook</RootNamespace>
     <AssemblyName>FreeLook</AssemblyName>
     <LangVersion>latest</LangVersion>
-    <AssemblyVersion>1.4.0.0</AssemblyVersion>
-    <FileVersion>1.4.0.0</FileVersion>
+    <!-- Version feeds AssemblyInformationalVersion, which the SDK suffixes with the HEAD commit.
+         Without it the build line logs the SDK default of "1.0.0+<sha>" while the MelonLoader banner
+         says the real version, and a player pasting their log shows two different numbers for one
+         mod. AssemblyVersion and FileVersion are DERIVED from this and are deliberately not set:
+         measured 2026-09-05, the SDK produces 1.5.0.0 for both from Version alone, so setting them
+         only adds two more places for a release to disagree with itself. -->
+    <Version>1.5.0</Version>
     <DebugType>none</DebugType>
   </PropertyGroup>
 

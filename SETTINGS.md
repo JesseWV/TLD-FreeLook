@@ -9,6 +9,7 @@ All of these are in-game under **Mod Settings → Free Look**. Nothing here need
 | Free look key | Left Alt | The key held to look around. A mouse button works too. None = off. |
 | Toggle instead of hold | Off | Tap to enter free look and tap again to leave, rather than holding. |
 | Double tap to latch | Off | A quick double tap latches free look on, another releases it. The only way in on a controller, where auto-walk (left stick click) latches it too. |
+| Recall key | X | Tapped to swing the view back to where you were last looking. It remembers the direction, so it still finds the place after you have turned. Works while looking around, and on its own: a tap engages free look and goes there. Tapping it again ends it, and so does the free look key. |
 | **Feel** |  |  |
 | Look range | 180° | How far the view may swing to each side of your direction of travel. 180 is straight behind you; the slider reaches 270. |
 | Return speed | 600°/s | How fast the view swings back once released. A glance returns promptly, a full swing takes proportionally longer. Zero snaps. |

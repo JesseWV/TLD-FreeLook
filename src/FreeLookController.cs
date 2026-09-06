@@ -16,6 +16,12 @@ internal static class FreeLookController
 
     private static bool _wasDown;
 
+    private static bool _wasWindowFocused = true;
+
+    private static int _lastApplyFrame;
+
+    private const int StalePostfixFrames = 10;
+
     private static vp_FPSCamera _pollContext;
 
     private static float _yawOffset;
@@ -29,6 +35,26 @@ internal static class FreeLookController
     private static float _returnDuration;
     private static float _returnYaw0;
     private static float _returnPitch0;
+
+    private static bool _haveMark;
+    private static float _markWorldYaw;
+    private static float _markPitch;
+
+    private const float MarkMinimumSwing = 2f;
+
+    private static bool _recallWasDown;
+
+    private static bool _recallHold;
+
+    private static bool _recalling;
+    private static float _recallElapsed;
+    private static float _recallDuration;
+    private static float _recallYaw0;
+    private static float _recallPitch0;
+    private static float _recallTargetYaw;
+    private static float _recallTargetPitch;
+
+    private static float _recallMoved;
 
     private static float _lastYaw;
 
@@ -71,11 +97,23 @@ internal static class FreeLookController
         _returnPitch0 = 0f;
         _lastYaw = float.NaN;
         _opposedAccum = 0f;
+        _recallHold = false;
+        _recalling = false;
+        _recallMoved = 0f;
+        _wasWindowFocused = Application.isFocused;
+
+    }
+
+    internal static void ForgetMark()
+    {
+        _haveMark = false;
+        _markWorldYaw = 0f;
+        _markPitch = 0f;
     }
 
     private static bool NeedsReset() =>
-        _yawOffset != 0f || _latched || _requested || _maskCleared || _focusFactor != 0f ||
-        _haveFov || _haveWeaponFov;
+        _yawOffset != 0f || _latched || _recallHold || _requested || _maskCleared ||
+        _focusFactor != 0f || _haveFov || _haveWeaponFov;
 
     private static int _gameplayFrame = -1;
     private static bool _gameplayCached;
@@ -135,17 +173,45 @@ internal static class FreeLookController
             return;
         }
 
-        if (!InGameplay() || !Application.isFocused)
+        bool windowFocused = Application.isFocused;
+        if (windowFocused != _wasWindowFocused)
         {
-            if (NeedsReset()) Reset();
+            _wasWindowFocused = windowFocused;
+            _latched = false;
+            _recallHold = false;
+            _recalling = false;
+            _lastTapTime = -1f;
 
             _wasDown = true;
+            _recallWasDown = true;
+        }
+
+        if (!InGameplay())
+        {
+            if (NeedsReset()) Reset();
+            _wasDown = true;
+            _recallWasDown = true;
             return;
         }
 
         bool down = ModifierIsDown();
         bool pressed = down && !_wasDown;
         _wasDown = down;
+
+        if (pressed && _recallHold)
+        {
+            _recallHold = false;
+            _recalling = false;
+
+            if (Config.ToggleMode || Config.DoubleTapLatch)
+            {
+                _latched = false;
+                _lastTapTime = -1f;
+                pressed = false;
+            }
+
+            if (Config.Verbose) Core.Log.Msg("RECALL hold handed back to the modifier");
+        }
 
         if (Config.Verbose && pressed)
         {
@@ -157,25 +223,30 @@ internal static class FreeLookController
             Core.Log.Msg($"TRIGGER key={keyDown} latchingMode={latching} controllerActive={ctrl} autoWalk={autoWalk}");
         }
 
+        if (Time.frameCount - _lastApplyFrame > StalePostfixFrames && NeedsReset()) Reset();
+
         PollFocus();
         UpdateFocus();
+        PollRecall();
 
-        if (!down && !pressed && !_latched)
+        if (!down && !pressed && !_latched && !_recallHold)
         {
             _requested = false;
             return;
         }
 
-        if (_latched && ControlWasTakenAway())
+        if ((_latched || _recallHold) && ControlWasTakenAway())
         {
             _latched = false;
+            _recallHold = false;
+            _recalling = false;
             _lastTapTime = -1f;
         }
 
         if (Config.ToggleMode)
         {
             if (pressed) _latched = !_latched;
-            _requested = _latched;
+            _requested = _latched || _recallHold;
         }
         else if (Config.DoubleTapLatch)
         {
@@ -193,13 +264,54 @@ internal static class FreeLookController
                 }
             }
 
-            _requested = _latched || down;
+            _requested = _latched || _recallHold || down;
         }
         else
         {
             _latched = false;
-            _requested = down;
+            _requested = down || _recallHold;
         }
+    }
+
+    private static void PollRecall()
+    {
+        bool down = Config.RecallKey != KeyCode.None && Input.GetKey(Config.RecallKey);
+        bool pressed = down && !_recallWasDown;
+        _recallWasDown = down;
+        if (!pressed) return;
+
+        if (_recallHold)
+        {
+            _recallHold = false;
+            _recalling = false;
+            if (Config.Verbose) Core.Log.Msg("RECALL released");
+            return;
+        }
+
+        if (!_haveMark)
+        {
+            if (Config.Verbose) Core.Log.Msg("RECALL nothing stored");
+            return;
+        }
+
+        if (_pollContext == null) _pollContext = UnityEngine.Object.FindObjectOfType<vp_FPSCamera>();
+        vp_FPSCamera camera = _pollContext;
+        if (camera == null) return;
+
+        if (!EngageGuardsPass(camera))
+        {
+
+            if (Config.Verbose)
+                Core.Log.Msg($"RECALL refused: freeCam={camera.IsFreeCameraLookEnabled()} " +
+                             $"aiming={camera.IsZoomed} equipped={!NothingEquipped()} " +
+                             $"crouched={IsCrouching()} controlMode={ControlModeAllowsFreeLook()} " +
+                             $"detached={CameraDetachedFromBody(camera)}");
+            return;
+        }
+
+        if (!_requested) _recallHold = true;
+
+        BeginRecall(camera);
     }
 
     private static void PollFocus()
@@ -307,7 +419,13 @@ internal static class FreeLookController
 
     private static bool ShouldEngage(vp_FPSCamera camera)
     {
-        if (!Config.EnableMod || !_requested || camera == null) return false;
+        if (!_requested) return false;
+        return EngageGuardsPass(camera);
+    }
+
+    private static bool EngageGuardsPass(vp_FPSCamera camera)
+    {
+        if (!Config.EnableMod || camera == null) return false;
 
         if (camera.IsFreeCameraLookEnabled()) return false;
 
@@ -336,6 +454,16 @@ internal static class FreeLookController
 
         if (!ShouldEngage(camera)) return;
 
+        if (_recalling)
+        {
+            _recallMoved += Mathf.Abs(input.x) + Mathf.Abs(input.y);
+            if (_recallMoved > TakeoverDeadzone)
+            {
+                _recalling = false;
+                if (Config.Verbose) Core.Log.Msg("RECALL handed over to the player");
+            }
+        }
+
         float limit = Mathf.Max(0f, Config.YawLimit);
         _yawOffset = Mathf.Clamp(_yawOffset + input.x, -limit, limit);
 
@@ -346,15 +474,19 @@ internal static class FreeLookController
     {
         if (camera == null) return;
 
+        _lastApplyFrame = Time.frameCount;
+
         if (!InGameplay()) return;
 
         bool engaged = ShouldEngage(camera);
 
         TurnBodyToAim(camera, engaged);
 
-        if (_latched && Config.DisableWhileAiming && camera.IsZoomed)
+        if ((_latched || _recallHold) && Config.DisableWhileAiming && camera.IsZoomed)
         {
             _latched = false;
+            _recallHold = false;
+            _recalling = false;
             _requested = false;
             _lastTapTime = -1f;
             if (Config.Verbose) Core.Log.Msg("weapon raised - latched free look released");
@@ -371,7 +503,7 @@ internal static class FreeLookController
         _wasEngaged = engaged;
 
         _indicatorEngaged = engaged;
-        _indicatorLatched = engaged && _latched;
+        _indicatorLatched = engaged && (_latched || _recallHold);
         _indicatorStamp = Time.unscaledTime;
 
         _aiming = camera.IsZoomed;
@@ -442,6 +574,16 @@ internal static class FreeLookController
         if (IsFreeLookControlMode(mode)) return true;
 
         return IsAimControlMode(mode) && !Config.DisableWhileAiming;
+    }
+
+    private static bool IsPlacementMode()
+    {
+        var pm = Il2Cpp.GameManager.GetPlayerManagerComponent();
+        if (pm == null) return false;
+
+        var mode = pm.GetControlMode();
+        return mode == Il2Cpp.PlayerControlMode.PlaceMesh ||
+               mode == Il2Cpp.PlayerControlMode.PlaceMeshPending;
     }
 
     private static bool IsFreeLookControlMode(Il2Cpp.PlayerControlMode mode) =>
@@ -635,12 +777,23 @@ internal static class FreeLookController
             }
 
             _returning = false;
+            if (_recalling) StepRecall(camera);
             _lastYaw = camera.m_Yaw;
             return;
         }
 
         if (_wasEngaged)
         {
+            MarkHere(camera);
+            _recalling = false;
+
+            if (IsPlacementMode())
+            {
+                CommitReturnToBody(camera);
+                _lastYaw = camera.m_Yaw;
+                return;
+            }
+
             BeginReturn(camera);
 
             if (_returning) ApplyPitch(camera, _returnPitch0);
@@ -671,7 +824,7 @@ internal static class FreeLookController
         _returnElapsed += Time.unscaledDeltaTime;
 
         float u = _returnDuration > 0f ? Mathf.Clamp01(_returnElapsed / _returnDuration) : 1f;
-        float eased = u * u * (3f - 2f * u);
+        float eased = Smoothstep(u);
 
         _yawOffset = Mathf.Lerp(_returnYaw0, 0f, eased);
         ApplyPitch(camera, Mathf.Lerp(_returnPitch0, _entryPitch, eased));
@@ -713,6 +866,71 @@ internal static class FreeLookController
         _returnDuration = distance / Config.ReturnSpeed;
         _returning = true;
     }
+
+    private static void MarkHere(vp_FPSCamera camera)
+    {
+        if (Mathf.Abs(_yawOffset) < MarkMinimumSwing) return;
+
+        _markWorldYaw = camera.m_Yaw + _yawOffset;
+        _markPitch = camera.m_Pitch;
+        _haveMark = true;
+
+        if (Config.Verbose)
+            Core.Log.Msg($"MARK world={_markWorldYaw:0.0} pitch={_markPitch:0.0} offset={_yawOffset:0.0}");
+    }
+
+    private static void BeginRecall(vp_FPSCamera camera)
+    {
+        float limit = Mathf.Max(0f, Config.YawLimit);
+        float wanted = Mathf.DeltaAngle(camera.m_Yaw, _markWorldYaw);
+        _recallTargetYaw = Mathf.Clamp(wanted, -limit, limit);
+        _recallTargetPitch = _markPitch;
+        _recallYaw0 = _yawOffset;
+        _recallPitch0 = camera.m_Pitch;
+        _recallElapsed = 0f;
+        _recallMoved = 0f;
+
+        float dYaw = _recallTargetYaw - _recallYaw0;
+        float dPitch = _recallTargetPitch - _recallPitch0;
+        float distance = Mathf.Sqrt(dYaw * dYaw + dPitch * dPitch);
+        if (distance <= 0f) { _recalling = false; return; }
+
+        if (Config.ReturnSpeed <= 0f)
+        {
+            _yawOffset = _recallTargetYaw;
+            ApplyPitch(camera, _recallTargetPitch);
+            _recalling = false;
+            return;
+        }
+
+        _recallDuration = distance / Config.ReturnSpeed;
+        _recalling = true;
+
+        if (Config.Verbose)
+            Core.Log.Msg($"RECALL wanted={wanted:0.0} target={_recallTargetYaw:0.0} " +
+                         $"clamped={(!Mathf.Approximately(wanted, _recallTargetYaw))} " +
+                         $"from={_recallYaw0:0.0} in={_recallDuration:0.00}s");
+    }
+
+    private static void StepRecall(vp_FPSCamera camera)
+    {
+        _recallElapsed += Time.unscaledDeltaTime;
+
+        float u = _recallDuration > 0f ? Mathf.Clamp01(_recallElapsed / _recallDuration) : 1f;
+        float eased = Smoothstep(u);
+
+        _yawOffset = Mathf.Lerp(_recallYaw0, _recallTargetYaw, eased);
+        ApplyPitch(camera, Mathf.Lerp(_recallPitch0, _recallTargetPitch, eased));
+
+        if (u >= 1f)
+        {
+            _yawOffset = _recallTargetYaw;
+            ApplyPitch(camera, _recallTargetPitch);
+            _recalling = false;
+        }
+    }
+
+    private static float Smoothstep(float u) => u * u * (3f - 2f * u);
 
     private static void CommitReturnToBody(vp_FPSCamera camera)
     {
